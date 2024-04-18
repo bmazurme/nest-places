@@ -32,13 +32,13 @@ describe('CardLikesController', () => {
     service = module.get<CardLikesService>(CardLikesService);
   });
 
-  it('.findAll() should call CardLikesService.findAll', () => {
+  it('.findAll() should call CardLikesController.findAll', () => {
     jest.spyOn(service, 'findAll');
     controller.findAll();
     expect(service.findAll).toHaveBeenCalled();
   });
 
-  it('.create() should call CardLikesService.create', () => {
+  it('.create() should call CardLikesController.create', () => {
     const createTagDto = { id: 0, cardId: 1, userId: 2 } as CreateCardLikeDto;
     const cardLike = { id: 0, cardId: 1, userId: 2 } as CardLike;
 
@@ -51,7 +51,7 @@ describe('CardLikesController', () => {
     expect(service.create).toHaveBeenCalledWith(cardLike);
   });
 
-  it('.findOne() should call CardLikesService.findOne', () => {
+  it('.findOne() should call CardLikesController.findOne', () => {
     const id = '0';
     const cardLike = { id: 0, cardId: 1, userId: 2 } as CardLike;
 
@@ -64,7 +64,7 @@ describe('CardLikesController', () => {
     expect(service.findOne).toHaveBeenCalledWith(0);
   });
 
-  it('.update() should call CardLikesService.update', () => {
+  it('.update() should call CardLikesController.update', () => {
     const id = '1';
     const updateCardDto = { id: 0, cardId: 1, userId: 2 } as UpdateCardLikeDto;
     const cardLike = { id: 0, cardId: 1, userId: 2 } as CardLike;
@@ -78,7 +78,7 @@ describe('CardLikesController', () => {
     expect(service.update).toHaveBeenCalledWith(+id, updateCardDto);
   });
 
-  it('.remove() should call CardLikesService.remove', async () => {
+  it('.remove() should call CardLikesController.remove', async () => {
     const id = '1';
     const cardLike = { id: 1, cardId: 1, userId: 2 } as CardLike;
 
