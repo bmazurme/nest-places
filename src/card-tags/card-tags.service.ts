@@ -1,26 +1,34 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCardTagDto } from './dto/create-card-tag.dto';
 import { UpdateCardTagDto } from './dto/update-card-tag.dto';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { CardTag } from './entities/card-tag.entity';
 
 @Injectable()
 export class CardTagsService {
+  constructor(
+    @InjectRepository(CardTag)
+    private readonly cardTagRepository: Repository<CardTag>,
+  ) {}
+
   create(createCardTagDto: CreateCardTagDto) {
-    return 'This action adds a new cardTag';
+    return this.cardTagRepository.save(createCardTagDto);
   }
 
   findAll() {
-    return `This action returns all cardTags`;
+    return this.cardTagRepository.find();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} cardTag`;
+    return this.cardTagRepository.findBy({ id });
   }
 
   update(id: number, updateCardTagDto: UpdateCardTagDto) {
-    return `This action updates a #${id} cardTag`;
+    return this.cardTagRepository.update(+id, updateCardTagDto);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} cardTag`;
+    return this.cardTagRepository.remove({ id });
   }
 }
