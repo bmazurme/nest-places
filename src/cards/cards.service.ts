@@ -11,6 +11,7 @@ export class CardsService {
     @InjectRepository(Card)
     private readonly cardRepository: Repository<Card>,
   ) {}
+
   create(createCardDto: CreateCardDto) {
     return this.cardRepository.save(createCardDto);
   }
