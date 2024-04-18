@@ -1,26 +1,34 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCardLikeDto } from './dto/create-card-like.dto';
 import { UpdateCardLikeDto } from './dto/update-card-like.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { CardLike } from './entities/card-like.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class CardLikesService {
+  constructor(
+    @InjectRepository(CardLike)
+    private readonly cardLikeRepository: Repository<CardLike>,
+  ) {}
+
   create(createCardLikeDto: CreateCardLikeDto) {
-    return 'This action adds a new cardLike';
+    return this.cardLikeRepository.save(createCardLikeDto);
   }
 
   findAll() {
-    return `This action returns all cardLikes`;
+    return this.cardLikeRepository.find();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} cardLike`;
+    return this.cardLikeRepository.findOneBy({ id });
   }
 
   update(id: number, updateCardLikeDto: UpdateCardLikeDto) {
-    return `This action updates a #${id} cardLike`;
+    return this.cardLikeRepository.update(+id, updateCardLikeDto);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} cardLike`;
+    return this.cardLikeRepository.remove({ id });
   }
 }
