@@ -31,6 +31,6 @@ export class CardTagsService {
   }
 
   remove(id: number) {
-    return this.cardTagRepository.remove({ id });
+    return this.cardTagRepository.delete(id);
   }
 }
