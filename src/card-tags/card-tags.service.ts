@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
 import { CreateCardTagDto } from './dto/create-card-tag.dto';
 import { UpdateCardTagDto } from './dto/update-card-tag.dto';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
+
 import { CardTag } from './entities/card-tag.entity';
 
 @Injectable()
