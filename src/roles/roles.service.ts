@@ -19,7 +19,7 @@ export class RolesService {
   }
 
   findAll() {
-    return this.roleRepository.find();
+    return this.roleRepository.find({});
   }
 
   findOne(id: number) {
@@ -31,6 +31,6 @@ export class RolesService {
   }
 
   remove(id: number) {
-    return this.roleRepository.remove({ id });
+    return this.roleRepository.delete(id);
   }
 }
