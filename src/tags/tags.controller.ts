@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  // UseGuards,
 } from '@nestjs/common';
 
 import { TagsService } from './tags.service';
@@ -13,6 +14,9 @@ import { TagsService } from './tags.service';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
 
+// import { JwtGuard } from 'src/oauth/jwt.guard';
+
+// @UseGuards(JwtGuard)
 @Controller('tags')
 export class TagsController {
   constructor(private readonly tagsService: TagsService) {}
