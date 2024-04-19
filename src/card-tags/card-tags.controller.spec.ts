@@ -32,13 +32,13 @@ describe('CardTagsController', () => {
     service = module.get<CardTagsService>(CardTagsService);
   });
 
-  it('.findAll() should call CardTagsService.findAll', () => {
+  it('.findAll() should call CardTagsController.findAll', () => {
     jest.spyOn(service, 'findAll');
     controller.findAll();
     expect(service.findAll).toHaveBeenCalled();
   });
 
-  it('.create() should call CardTagsService.create', () => {
+  it('.create() should call CardTagsController.create', () => {
     const createTagDto = { id: 0, cardId: 1, tagId: 2 } as CreateCardTagDto;
     const cardTag = { id: 0, cardId: 1, tagId: 2 } as CardTag;
 
@@ -51,9 +51,9 @@ describe('CardTagsController', () => {
     expect(service.create).toHaveBeenCalledWith(cardTag);
   });
 
-  it('.findOne() should call CardTagsService.findOne', () => {
+  it('.findOne() should call CardTagsController.findOne', () => {
     const id = '0';
-    const cardTag = { id: 0, cardId: 1, userId: 2 } as CardTag;
+    const cardTag = { id: 0, cardId: 1, userId: 2 } as unknown as CardTag;
 
     jest.spyOn(cardTagsServiceMock, 'findOne').mockReturnValue(cardTag);
 
@@ -64,7 +64,7 @@ describe('CardTagsController', () => {
     expect(service.findOne).toHaveBeenCalledWith(0);
   });
 
-  it('.update() should call CardTagsService.update', () => {
+  it('.update() should call CardTagsController.update', () => {
     const id = '1';
     const updateCardDto = { id: 0, cardId: 1, tagId: 2 } as UpdateCardTagDto;
     const cardTag = { id: 0, cardId: 1, tagId: 2 } as CardTag;
@@ -78,7 +78,7 @@ describe('CardTagsController', () => {
     expect(service.update).toHaveBeenCalledWith(+id, updateCardDto);
   });
 
-  it('.remove() should call CardTagsService.remove', async () => {
+  it('.remove() should call CardTagsController.remove', async () => {
     const id = '1';
     const cardTag = { id: 1, cardId: 1, tagId: 2 } as CardTag;
 
