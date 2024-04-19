@@ -19,7 +19,7 @@ export class TagsService {
   }
 
   findAll() {
-    return this.tagRepository.find();
+    return this.tagRepository.find({}) || [];
   }
 
   findOne(id: number) {
@@ -31,6 +31,6 @@ export class TagsService {
   }
 
   remove(id: number) {
-    return this.tagRepository.remove({ id });
+    return this.tagRepository.delete(id);
   }
 }
