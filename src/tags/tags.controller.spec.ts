@@ -32,13 +32,13 @@ describe('TagsController', () => {
     tagsService = module.get<TagsService>(TagsService);
   });
 
-  it('.findAll() should call TagsService.findAll', () => {
+  it('.findAll() should call TagsController.findAll', () => {
     jest.spyOn(tagsService, 'findAll');
     controller.findAll();
     expect(tagsService.findAll).toHaveBeenCalled();
   });
 
-  it('.create() should call TagsService.create', () => {
+  it('.create() should call TagsController.create', () => {
     const createTagDto = { name: 'Name' } as CreateTagDto;
     const tag = { id: 0, name: 'Name' } as Tag;
 
@@ -51,7 +51,7 @@ describe('TagsController', () => {
     expect(tagsService.create).toHaveBeenCalledWith({ name: 'Name' });
   });
 
-  it('.findOne() should call TagsService.findOne', () => {
+  it('.findOne() should call TagsController.findOne', () => {
     const id = '0';
     const tag = { id: 0, name: 'Name' } as Tag;
 
@@ -64,7 +64,7 @@ describe('TagsController', () => {
     expect(tagsServiceMock.findOne).toHaveBeenCalledWith(0);
   });
 
-  it('.update() should call TagsService.update', () => {
+  it('.update() should call TagsController.update', () => {
     const id = '1';
     const updateTagDto = { name: 'Name' } as UpdateTagDto;
     const tag = { id: 0, name: 'Name' } as Tag;
@@ -78,7 +78,7 @@ describe('TagsController', () => {
     expect(tagsService.update).toHaveBeenCalledWith(+id, updateTagDto);
   });
 
-  it('.remove() should call TagsService.remove', async () => {
+  it('.remove() should call TagsController.remove', async () => {
     const id = '1';
     const tag = { id: 0, name: 'Name' } as Tag;
 
