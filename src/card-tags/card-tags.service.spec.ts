@@ -49,7 +49,7 @@ describe('CardTagsService', () => {
 
   it('.findOne() should call CardTagsService.findOne', () => {
     const id = '0';
-    const cardTag = { id: 0, cardId: 1, userId: 2 } as CardTag;
+    const cardTag = { id: 0, cardId: 1, userId: 2 } as unknown as CardTag;
 
     jest.spyOn(cardTagsServiceMock, 'findOne').mockReturnValue(cardTag);
 
