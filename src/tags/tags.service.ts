@@ -19,7 +19,7 @@ export class TagsService {
   }
 
   findAll() {
-    return this.tagRepository.find({}) || [];
+    return this.tagRepository.find();
   }
 
   findOne(id: number) {
