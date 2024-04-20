@@ -31,6 +31,6 @@ export class UserRolesService {
   }
 
   remove(id: number) {
-    return this.userRoleRepository.remove({ id });
+    return this.userRoleRepository.delete({ id });
   }
 }
