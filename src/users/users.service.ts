@@ -1,7 +1,7 @@
 import {
   Injectable,
   // NotFoundException,
-  // BadRequestException,
+  BadRequestException,
 } from '@nestjs/common';
 
 import { Repository } from 'typeorm';
@@ -20,13 +20,13 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    // const existUsers = await this.findByEmail(createUserDto.email);
+    const existUsers = await this.findByEmail(createUserDto.email);
 
-    // if (existUsers) {
-    //   throw new BadRequestException(
-    //     'Пользователь с указанным email или username уже существует',
-    //   );
-    // }
+    if (existUsers) {
+      throw new BadRequestException(
+        'Пользователь с указанным email или username уже существует',
+      );
+    }
 
     return await this.userRepository.save(createUserDto);
   }
