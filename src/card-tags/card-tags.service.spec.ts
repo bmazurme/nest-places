@@ -35,8 +35,12 @@ describe('CardTagsService', () => {
   });
 
   it('.create() should call CardTagsService.create', () => {
-    const createTagDto = { id: 0, cardId: 1, tagId: 2 } as CreateCardTagDto;
-    const cardTag = { id: 0, cardId: 1, tagId: 2 } as CardTag;
+    const createTagDto = {
+      id: 0,
+      cardId: 1,
+      tagId: 2,
+    } as unknown as CreateCardTagDto;
+    const cardTag = { id: 0, cardId: 1, tagId: 2 } as unknown as CardTag;
 
     jest.spyOn(cardTagsServiceMock, 'create').mockReturnValue(cardTag);
 
@@ -63,7 +67,7 @@ describe('CardTagsService', () => {
   it('.update() should call CardTagsService.update', () => {
     const id = '1';
     const updateCardDto = { id: 0, cardId: 1, tagId: 2 } as UpdateCardTagDto;
-    const cardTag = { id: 0, cardId: 1, tagId: 2 } as CardTag;
+    const cardTag = { id: 0, cardId: 1, tagId: 2 } as unknown as CardTag;
 
     jest.spyOn(cardTagsServiceMock, 'update').mockReturnValue(cardTag);
 
@@ -76,7 +80,7 @@ describe('CardTagsService', () => {
 
   it('.remove() should call CardTagsService.remove', async () => {
     const id = '1';
-    const cardTag = { id: 1, cardId: 1, tagId: 2 } as CardTag;
+    const cardTag = { id: 1, cardId: 1, tagId: 2 } as unknown as CardTag;
 
     jest.spyOn(cardTagsServiceMock, 'remove').mockReturnValue(cardTag);
 
