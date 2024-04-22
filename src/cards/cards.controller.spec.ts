@@ -45,7 +45,7 @@ describe('CardsController', () => {
       name: 'Name',
       link: '',
       userId: 0,
-    } as Card;
+    } as unknown as Card;
 
     jest.spyOn(cardsServiceMock, 'create').mockReturnValue(card);
 
@@ -67,7 +67,7 @@ describe('CardsController', () => {
       name: 'Name',
       link: '',
       userId: 0,
-    } as Card;
+    } as unknown as Card;
 
     jest.spyOn(cardsServiceMock, 'findOne').mockReturnValue(card);
 
@@ -99,7 +99,7 @@ describe('CardsController', () => {
       name: 'Name',
       link: '',
       userId: 0,
-    } as Card;
+    } as unknown as Card;
 
     jest.spyOn(cardsServiceMock, 'remove').mockReturnValue(card);
 
