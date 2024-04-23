@@ -1,16 +1,20 @@
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, OneToMany } from 'typeorm';
 import { Length, IsUrl, IsEmail } from 'class-validator';
 
 import { BaseEntity } from '../../base-entity';
+import { Card } from '../../cards/entities/card.entity';
+import { UserRole } from '../../user-roles/entities/user-role.entity';
 
 @Entity()
 export class User extends BaseEntity {
-  // @Column()
-  // @Length(2, 30)
-  // username: string;
+  @Column({
+    default: 'Guest',
+  })
+  @Length(2, 30)
+  name: string;
 
   @Column({
-    default: 'Пока ничего не рассказал о себе',
+    default: '...',
   })
   @Length(2, 200)
   about: string;
@@ -26,4 +30,10 @@ export class User extends BaseEntity {
   })
   @IsEmail()
   email: string;
+
+  @OneToMany(() => Card, (card) => card.user)
+  cards: Card[];
+
+  @OneToMany(() => UserRole, (userRole) => userRole.id)
+  public userRole: UserRole[];
 }
