@@ -2,8 +2,8 @@ import { IsNumber } from 'class-validator';
 
 export class CreateUserRoleDto {
   @IsNumber()
-  cardId: number;
+  userId: number;
 
   @IsNumber()
-  tagId: number;
+  roleId: number;
 }
