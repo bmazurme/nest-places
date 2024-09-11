@@ -20,12 +20,11 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const existUsers = await this.findByEmail(createUserDto.email);
+    const { email } = createUserDto;
+    const existUsers = await this.findByEmail(email);
 
     if (existUsers) {
-      throw new BadRequestException(
-        'Пользователь с указанным email или username уже существует',
-      );
+      throw new BadRequestException(`user with${email} exist`);
     }
 
     return await this.userRepository.save(createUserDto);
