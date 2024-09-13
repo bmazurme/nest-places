@@ -14,14 +14,11 @@ export class OAuthService {
     // private readonly hashService: HashService,
   ) {}
 
-  async signinOrSignup(user: User) {
-    const { email } = user;
+  async signinOrSignup({ email }: User) {
     let currentUser = await this.usersService.findByEmail(email);
 
     if (!currentUser) {
-      currentUser = await this.usersService.create({
-        email: user.email,
-      });
+      currentUser = await this.usersService.create({ email });
     }
 
     const payload = { sub: currentUser.id };
