@@ -1,6 +1,8 @@
 import { WinstonModule } from 'nest-winston';
-import { format, transports } from 'winston';
-import WinstonTelegram from 'winston-telegram';
+import { transports, format } from 'winston';
+import * as WinstonTelegram from 'winston-telegram';
+
+import 'winston-daily-rotate-file';
 
 export const option: WinstonTelegram.Options = {
   token: process.env.TELEGRAM_TOKEN,
