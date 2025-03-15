@@ -50,8 +50,8 @@ export const loggerConfig = {
 };
 
 export const config = new DocumentBuilder()
-  .setTitle('Cats example')
-  .setDescription('The cats API description')
+  .setTitle('NTLSTL place')
+  .setDescription('The place API description')
   .setVersion('1.0')
-  .addTag('cats')
+  .addTag('ntlstl')
   .build();
