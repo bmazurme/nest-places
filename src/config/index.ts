@@ -3,6 +3,7 @@ import { transports, format } from 'winston';
 import * as WinstonTelegram from 'winston-telegram';
 
 import 'winston-daily-rotate-file';
+import { DocumentBuilder } from '@nestjs/swagger';
 
 export const option: WinstonTelegram.Options = {
   token: process.env.TELEGRAM_TOKEN,
@@ -47,3 +48,10 @@ export const loggerConfig = {
     ],
   }),
 };
+
+export const config = new DocumentBuilder()
+  .setTitle('Cats example')
+  .setDescription('The cats API description')
+  .setVersion('1.0')
+  .addTag('cats')
+  .build();

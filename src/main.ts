@@ -1,16 +1,16 @@
 import { NestFactory } from '@nestjs/core';
-// import { WinstonModule } from 'nest-winston';
-// import { transports, format } from 'winston';
-// import * as WinstonTelegram from 'winston-telegram';
-import 'winston-daily-rotate-file';
+import { SwaggerModule } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
-import { loggerConfig } from './config';
+import { loggerConfig, config } from './config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, loggerConfig);
-
   app.enableCors();
+
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, documentFactory);
+
   await app.listen(4000);
 }
 bootstrap();
