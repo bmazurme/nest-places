@@ -3,8 +3,8 @@ import { transports, format } from 'winston';
 import * as WinstonTelegram from 'winston-telegram';
 
 import 'winston-daily-rotate-file';
-import { DocumentBuilder } from '@nestjs/swagger';
 
+export * from './swagger.config';
 export const option: WinstonTelegram.Options = {
   token: process.env.TELEGRAM_TOKEN,
   chatId: Number(process.env.TELEGRAM_CHAT_ID),
@@ -48,10 +48,3 @@ export const loggerConfig = {
     ],
   }),
 };
-
-export const config = new DocumentBuilder()
-  .setTitle('NTLSTL place')
-  .setDescription('The place API description')
-  .setVersion('1.0')
-  .addTag('ntlstl')
-  .build();
