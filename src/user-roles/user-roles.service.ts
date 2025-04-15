@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -22,8 +22,14 @@ export class UserRolesService {
     return this.userRoleRepository.find();
   }
 
-  findOne(id: number) {
-    return this.userRoleRepository.findOneBy({ id });
+  async findOne(id: number) {
+    const userRole = await this.userRoleRepository.findOneBy({ id });
+
+    if (!userRole) {
+      throw new NotFoundException(`user role with id ${id} not found`);
+    }
+
+    return userRole;
   }
 
   update(id: number, updateUserRoleDto: UpdateUserRoleDto) {
