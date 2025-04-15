@@ -1,6 +1,6 @@
 import {
   Injectable,
-  // NotFoundException,
+  NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
 
@@ -24,7 +24,7 @@ export class UsersService {
     const existUsers = await this.findByEmail(email);
 
     if (existUsers) {
-      throw new BadRequestException(`user with${email} exist`);
+      throw new BadRequestException(`user with email ${email} exist`);
     }
 
     return await this.userRepository.save(createUserDto);
@@ -35,11 +35,23 @@ export class UsersService {
   }
 
   findOne(id: number) {
-    return this.userRepository.findOneBy({ id });
+    const user = this.userRepository.findOneBy({ id });
+
+    if (!user) {
+      throw new NotFoundException(`user with id ${id} not found`);
+    }
+
+    return user;
   }
 
   findByEmail(email: string) {
-    return this.userRepository.findOneBy({ email });
+    const user = this.userRepository.findOneBy({ email });
+
+    if (!user) {
+      throw new NotFoundException(`user with email ${email} not found`);
+    }
+
+    return user;
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
