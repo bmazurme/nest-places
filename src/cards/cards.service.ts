@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -22,8 +22,14 @@ export class CardsService {
     return this.cardRepository.find();
   }
 
-  findOne(id: number) {
-    return this.cardRepository.findOneBy({ id });
+  async findOne(id: number) {
+    const card = await this.cardRepository.findOneBy({ id });
+
+    if (!card) {
+      throw new NotFoundException(`card with id ${id} not found`);
+    }
+
+    return card;
   }
 
   update(id: number, updateCardDto: UpdateCardDto) {
