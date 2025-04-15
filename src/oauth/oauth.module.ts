@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { CacheModule } from '@nestjs/cache-manager';
 
 import { OAuthService } from './oauth.service';
 // import { HashModule } from 'src/hash/hash.module';
@@ -14,6 +15,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 @Module({
   imports: [
     UsersModule,
+    CacheModule.register(),
     // HashModule,
     JwtModule.registerAsync({
       imports: [ConfigModule.forRoot()],
