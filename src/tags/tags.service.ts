@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -22,8 +22,14 @@ export class TagsService {
     return this.tagRepository.find();
   }
 
-  findOne(id: number) {
-    return this.tagRepository.findOneBy({ id });
+  async findOne(id: number) {
+    const tag = await this.tagRepository.findOneBy({ id });
+
+    if (!tag) {
+      throw new NotFoundException(`tag with id ${id} not found`);
+    }
+
+    return tag;
   }
 
   update(id: number, updateTagDto: UpdateTagDto) {
