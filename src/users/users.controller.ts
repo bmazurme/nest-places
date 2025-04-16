@@ -7,6 +7,9 @@ import {
   Param,
   Delete,
   Req,
+  // SerializeOptions,
+  UseInterceptors,
+  ClassSerializerInterceptor,
   // UseGuards,
 } from '@nestjs/common';
 
@@ -18,9 +21,11 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 import { User } from './entities/user.entity';
+// import { GROUP_USER } from '../base-entity';
 
 // @UseGuards(JwtGuard)
 @Controller('users')
+@UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -30,7 +35,10 @@ export class UsersController {
   }
 
   @Get()
-  findAll() {
+  // @SerializeOptions({
+  //   groups: [GROUP_USER],
+  // })
+  findAll(): Promise<User[]> {
     return this.usersService.findAll();
   }
 
@@ -44,10 +52,10 @@ export class UsersController {
   //   return this.usersService.get();
   // }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.usersService.findOne(+id);
-  // }
+  @Get(':id')
+  findOneById(@Param('id') id: string) {
+    return this.usersService.findOne(+id);
+  }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
