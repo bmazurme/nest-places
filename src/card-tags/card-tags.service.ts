@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -22,8 +22,12 @@ export class CardTagsService {
     return this.cardTagRepository.find();
   }
 
-  findOne(id: number) {
-    return this.cardTagRepository.findBy({ id });
+  async findOne(id: number) {
+    const cardTag = await this.cardTagRepository.findBy({ id });
+    if (cardTag) {
+      throw new BadRequestException(`card tag with id ${id} exist`);
+    }
+    return cardTag;
   }
 
   update(id: number, updateCardTagDto: UpdateCardTagDto) {
