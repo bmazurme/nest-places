@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -22,8 +22,14 @@ export class RolesService {
     return this.roleRepository.find({});
   }
 
-  findOne(id: number) {
-    return this.roleRepository.findOneBy({ id });
+  async findOne(id: number) {
+    const role = await this.roleRepository.findOneBy({ id });
+
+    if (role) {
+      throw new BadRequestException(`role with id ${id} exist`);
+    }
+
+    return role;
   }
 
   update(id: number, updateRoleDto: UpdateRoleDto) {
