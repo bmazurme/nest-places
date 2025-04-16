@@ -1,4 +1,12 @@
-import { Controller, Get, UseGuards, HttpStatus, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  UseGuards,
+  HttpStatus,
+  Req,
+  UseInterceptors,
+  ClassSerializerInterceptor,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 import { OAuthService } from './oauth.service';
@@ -6,6 +14,7 @@ import { OAuthService } from './oauth.service';
 import { User } from 'src/users/entities/user.entity';
 
 @Controller('oauth')
+@UseInterceptors(ClassSerializerInterceptor)
 export class OAuthController {
   constructor(private readonly oauthService: OAuthService) {}
 
