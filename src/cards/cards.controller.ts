@@ -6,6 +6,8 @@ import {
   Patch,
   Param,
   Delete,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 
 import { CardsService } from './cards.service';
@@ -14,6 +16,7 @@ import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
 
 @Controller('cards')
+@UseInterceptors(ClassSerializerInterceptor)
 export class CardsController {
   constructor(private readonly cardsService: CardsService) {}
 
