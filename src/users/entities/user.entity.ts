@@ -5,11 +5,14 @@ import { BaseEntity } from '../../base-entity';
 import { Card } from '../../cards/entities/card.entity';
 import { UserRole } from '../../user-roles/entities/user-role.entity';
 
+// import { GROUP_USER } from '../../base-entity';
+
 @Entity()
 export class User extends BaseEntity {
   @Column({
     default: 'Guest',
   })
+  // @Expose({ groups: [GROUP_USER] })
   @Length(2, 30)
   name: string;
 
