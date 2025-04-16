@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 
 // import { HashService } from '../hash/hash.service';
 import { UsersService } from '../users/users.service';
 
 import { User } from '../users/entities/user.entity';
-import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 
 @Injectable()
 export class OAuthService {
