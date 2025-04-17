@@ -8,26 +8,36 @@ import {
   Delete,
   UseInterceptors,
   ClassSerializerInterceptor,
+  Req,
+  UseGuards,
+  SerializeOptions,
 } from '@nestjs/common';
 
 import { CardsService } from './cards.service';
 
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
+import { User } from '../users/entities/user.entity';
+import { JwtGuard } from '../oauth/jwt.guard';
+import { GROUP_USER } from '../base-entity';
 
 @Controller('cards')
 @UseInterceptors(ClassSerializerInterceptor)
 export class CardsController {
   constructor(private readonly cardsService: CardsService) {}
 
+  @UseGuards(JwtGuard)
   @Post()
-  create(@Body() createCardDto: CreateCardDto) {
-    return this.cardsService.create(createCardDto);
+  create(@Body() createCardDto: CreateCardDto, @Req() req: { user: User }) {
+    return this.cardsService.create(createCardDto, req.user);
   }
 
   @Get()
-  findAll() {
-    return this.cardsService.findAll();
+  @SerializeOptions({
+    groups: [GROUP_USER],
+  })
+  async findAll() {
+    return await this.cardsService.findAll();
   }
 
   @Get(':id')
