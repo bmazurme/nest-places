@@ -7,6 +7,8 @@ import { Card } from './entities/card.entity';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
 
+import { User } from '../users/entities/user.entity';
+
 @Injectable()
 export class CardsService {
   constructor(
@@ -14,12 +16,19 @@ export class CardsService {
     private readonly cardRepository: Repository<Card>,
   ) {}
 
-  create(createCardDto: CreateCardDto) {
-    return this.cardRepository.save(createCardDto);
+  create(createCardDto: CreateCardDto, owner: User) {
+    return this.cardRepository.save({ ...createCardDto, user: owner });
   }
 
-  findAll() {
-    return this.cardRepository.find();
+  async findAll() {
+    return await this.cardRepository.find({
+      relations: ['user'],
+      select: {
+        user: {
+          id: true,
+        },
+      },
+    });
   }
 
   async findOne(id: number) {
