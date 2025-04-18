@@ -3,11 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { Card } from './entities/card.entity';
+import { User } from '../users/entities/user.entity';
 
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
-
-import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class CardsService {
@@ -22,17 +21,41 @@ export class CardsService {
 
   async findAll() {
     return await this.cardRepository.find({
-      relations: ['user'],
+      relations: {
+        user: true,
+        like: true,
+        cardTag: true,
+      },
       select: {
         user: {
           id: true,
+        },
+        cardTag: {
+          cardId: true,
+          tagId: true,
         },
       },
     });
   }
 
   async findOne(id: number) {
-    const card = await this.cardRepository.findOneBy({ id });
+    const card = await this.cardRepository.findOne({
+      where: { id },
+      relations: {
+        user: true,
+        like: true,
+        cardTag: true,
+      },
+      select: {
+        user: {
+          id: true,
+        },
+        cardTag: {
+          cardId: true,
+          tagId: true,
+        },
+      },
+    });
 
     if (!card) {
       throw new NotFoundException(`card with id ${id} not found`);
