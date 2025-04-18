@@ -64,7 +64,7 @@ describe('UsersController', () => {
       name: 'Name',
       about: 'About',
       email: 'email@email.com',
-    } as User;
+    };
 
     jest.spyOn(usersServiceMock, 'findOne').mockReturnValue(user);
 
