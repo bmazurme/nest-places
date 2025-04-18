@@ -37,6 +37,6 @@ export class User extends BaseEntity {
   @OneToMany(() => Card, (card) => card.user)
   cards: Card[];
 
-  @OneToMany(() => UserRole, (userRole) => userRole.id)
+  @OneToMany(() => UserRole, (userRole) => userRole.user)
   public userRole: UserRole[];
 }
