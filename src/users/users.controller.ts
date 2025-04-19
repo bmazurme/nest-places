@@ -17,11 +17,11 @@ import { UsersService } from './users.service';
 
 import { JwtGuard } from '../oauth/jwt.guard';
 
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-
 import { User } from './entities/user.entity';
 // import { GROUP_USER } from '../base-entity';
+
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @UseGuards(JwtGuard)
 @Controller('users')
