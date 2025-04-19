@@ -7,10 +7,10 @@ import {
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
+import { User } from './entities/user.entity';
+
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-
-import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
@@ -50,13 +50,7 @@ export class UsersService {
   }
 
   async findByEmail(email: string) {
-    const user = await this.userRepository.findOneBy({ email });
-
-    // if (!user) {
-    //   throw new NotFoundException(`user with email ${email} not found`);
-    // }
-
-    return user;
+    return await this.userRepository.findOneBy({ email });
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
