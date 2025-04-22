@@ -6,6 +6,8 @@ import {
   Patch,
   Param,
   Delete,
+  UseInterceptors,
+  ClassSerializerInterceptor,
   // UseGuards,
 } from '@nestjs/common';
 
@@ -18,6 +20,7 @@ import { UpdateTagDto } from './dto/update-tag.dto';
 
 // @UseGuards(JwtGuard)
 @Controller('tags')
+@UseInterceptors(ClassSerializerInterceptor)
 export class TagsController {
   constructor(private readonly tagsService: TagsService) {}
 
