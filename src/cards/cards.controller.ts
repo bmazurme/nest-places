@@ -14,12 +14,13 @@ import {
 } from '@nestjs/common';
 
 import { CardsService } from './cards.service';
+import { User } from '../users/entities/user.entity';
+import { GROUP_USER } from '../base-entity';
 
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
-import { User } from '../users/entities/user.entity';
+
 import { JwtGuard } from '../oauth/jwt.guard';
-import { GROUP_USER } from '../base-entity';
 
 @Controller('cards')
 @UseInterceptors(ClassSerializerInterceptor)
