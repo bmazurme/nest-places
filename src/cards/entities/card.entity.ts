@@ -28,6 +28,5 @@ export class Card extends BaseEntity {
   like: Like[];
 
   @OneToMany(() => CardTag, (cardTag) => cardTag.card)
-  // @JoinTable()
   cardTag: CardTag[];
 }
