@@ -31,7 +31,7 @@ export class CardsService {
           id: true,
         },
         cardTag: {
-          cardId: true,
+          // cardId: true,
           tagId: true,
         },
       },
@@ -51,7 +51,7 @@ export class CardsService {
           id: true,
         },
         cardTag: {
-          cardId: true,
+          // cardId: true,
           tagId: true,
         },
       },
