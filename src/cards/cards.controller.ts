@@ -11,6 +11,7 @@ import {
   Req,
   UseGuards,
   SerializeOptions,
+  UploadedFile,
 } from '@nestjs/common';
 
 import { CardsService } from './cards.service';
@@ -21,6 +22,7 @@ import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
 
 import { JwtGuard } from '../oauth/jwt.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('cards')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -54,5 +56,11 @@ export class CardsController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.cardsService.remove(+id);
+  }
+
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  uploadFile(@UploadedFile() file: Express.Multer.File) {
+    return this.cardsService.upload(file);
   }
 }
