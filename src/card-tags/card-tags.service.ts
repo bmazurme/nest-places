@@ -19,7 +19,11 @@ export class CardTagsService {
   }
 
   findAll() {
-    return this.cardTagRepository.find();
+    return this.cardTagRepository.find({
+      relations: {
+        tag: true,
+      },
+    });
   }
 
   async findOne(id: number) {
