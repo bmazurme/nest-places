@@ -24,15 +24,15 @@ export class CardsService {
       relations: {
         user: true,
         like: true,
-        cardTag: true,
+        tags: true,
       },
       select: {
         user: {
           id: true,
+          name: true,
         },
-        cardTag: {
-          // cardId: true,
-          tagId: true,
+        tags: {
+          name: true,
         },
       },
     });
@@ -44,15 +44,15 @@ export class CardsService {
       relations: {
         user: true,
         like: true,
-        cardTag: true,
+        tags: true,
       },
       select: {
         user: {
           id: true,
+          name: true,
         },
-        cardTag: {
-          // cardId: true,
-          tagId: true,
+        tags: {
+          name: true,
         },
       },
     });
@@ -70,5 +70,11 @@ export class CardsService {
 
   remove(id: number) {
     return this.cardRepository.delete(id);
+  }
+
+  // @Post('upload')
+  upload(file: Express.Multer.File) {
+    console.log(file);
+    return null;
   }
 }
