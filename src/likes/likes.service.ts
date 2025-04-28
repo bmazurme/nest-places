@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { NotFoundException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 import { Like } from './entities/like.entity';
 
@@ -13,11 +13,20 @@ export class LikesService {
     private readonly likeRepository: Repository<Like>,
   ) {}
 
-  create(createLikeDto: CreateLikeDto) {
+  like(createLikeDto: CreateLikeDto) {
     return this.likeRepository.save(createLikeDto);
   }
 
-  remove(id: number) {
-    return this.likeRepository.save({ id });
+  async dislike(createLikeDto: CreateLikeDto) {
+    const like = await this.likeRepository.findOne({
+      where: { ...createLikeDto },
+      select: { id: true },
+    });
+
+    if (!like) {
+      throw new NotFoundException('not found');
+    }
+
+    return this.likeRepository.delete(like.id);
   }
 }
