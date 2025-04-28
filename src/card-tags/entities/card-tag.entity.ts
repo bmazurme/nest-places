@@ -13,9 +13,9 @@ export class CardTag extends BaseEntity {
   @Column()
   public tagId: number;
 
-  @ManyToOne(() => Card, (card) => card.cardTag)
+  @ManyToOne(() => Card, (card) => card.cardTags)
   public card: Card;
 
-  @ManyToOne(() => Tag, (tag) => tag.id)
+  @ManyToOne(() => Tag, (tag) => tag.cardTags)
   public tag: Tag;
 }
