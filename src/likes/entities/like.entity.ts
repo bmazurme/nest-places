@@ -1,4 +1,4 @@
-import { Entity, ManyToOne } from 'typeorm';
+import { Entity, JoinTable, ManyToOne } from 'typeorm';
 
 import { BaseEntity } from '../../base-entity';
 
@@ -7,9 +7,10 @@ import { User } from '../../users/entities/user.entity';
 
 @Entity()
 export class Like extends BaseEntity {
-  @ManyToOne(() => Card, (card) => card.like)
+  @ManyToOne(() => Card, (card) => card.likes)
   card: Card;
 
-  @ManyToOne(() => User, (user) => user.cards)
+  @ManyToOne(() => User, (user) => user.likes)
+  @JoinTable()
   user: User;
 }
