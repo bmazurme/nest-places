@@ -6,13 +6,16 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 
 import { CardTagsService } from './card-tags.service';
 
 import { CreateCardTagDto } from './dto/create-card-tag.dto';
 import { UpdateCardTagDto } from './dto/update-card-tag.dto';
+import { JwtGuard } from '../oauth/jwt.guard';
 
+@UseGuards(JwtGuard)
 @Controller('card-tags')
 export class CardTagsController {
   constructor(private readonly cardTagsService: CardTagsService) {}
