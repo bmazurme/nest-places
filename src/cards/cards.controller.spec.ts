@@ -3,6 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CardsController } from './cards.controller';
 import { CardsService } from './cards.service';
 import { Card } from './entities/card.entity';
+import { User } from '../users/entities/user.entity';
 
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
@@ -39,25 +40,29 @@ describe('CardsController', () => {
   });
 
   it('.create() should call CardsService.create', () => {
-    const createTagDto = { name: 'Name', link: '', userId: 0 } as CreateCardDto;
+    const createTagDto = {
+      name: 'Name',
+      link: '',
+      userId: 1,
+    } as unknown as CreateCardDto;
     const card = {
       id: 0,
       name: 'Name',
       link: '',
-      userId: 0,
+      userId: 1,
     } as unknown as Card;
+    const user = { id: 1 } as unknown as User;
 
     jest.spyOn(cardsServiceMock, 'create').mockReturnValue(card);
 
-    const result = controller.create(createTagDto);
+    const result = controller.create(createTagDto, { user });
 
     expect(result).toEqual(card);
     expect(service.create).toHaveBeenCalled();
-    expect(service.create).toHaveBeenCalledWith({
-      name: 'Name',
-      link: '',
-      userId: 0,
-    });
+    expect(service.create).toHaveBeenCalledWith(
+      { link: '', name: 'Name', userId: 1 },
+      { id: 1 },
+    );
   });
 
   it('.findOne() should call CardsService.findOne', () => {
