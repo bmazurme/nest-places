@@ -12,9 +12,12 @@ import {
   UseGuards,
   SerializeOptions,
   UploadedFile,
+  Put,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 import { CardsService } from './cards.service';
+import { LikesService } from '../likes/likes.service';
 import { User } from '../users/entities/user.entity';
 import { GROUP_USER } from '../base-entity';
 
@@ -22,12 +25,14 @@ import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
 
 import { JwtGuard } from '../oauth/jwt.guard';
-import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('cards')
 @UseInterceptors(ClassSerializerInterceptor)
 export class CardsController {
-  constructor(private readonly cardsService: CardsService) {}
+  constructor(
+    private readonly cardsService: CardsService,
+    private readonly likesService: LikesService,
+  ) {}
 
   @UseGuards(JwtGuard)
   @Post()
@@ -35,6 +40,7 @@ export class CardsController {
     return this.cardsService.create(createCardDto, req.user);
   }
 
+  @UseGuards(JwtGuard)
   @Get()
   @SerializeOptions({
     groups: [GROUP_USER],
@@ -43,6 +49,7 @@ export class CardsController {
     return await this.cardsService.findAll();
   }
 
+  @UseGuards(JwtGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.cardsService.findOne(+id);
@@ -53,6 +60,19 @@ export class CardsController {
     return this.cardsService.update(+id, updateCardDto);
   }
 
+  @UseGuards(JwtGuard)
+  @Put(':id/like')
+  like(@Param('id') id: string, @Req() req: { user: User }) {
+    return this.likesService.like({ card: { id: +id }, user: req.user });
+  }
+
+  @UseGuards(JwtGuard)
+  @Delete(':id/like')
+  dislike(@Param('id') id: string, @Req() req: { user: User }) {
+    return this.likesService.dislike({ card: { id: +id }, user: req.user });
+  }
+
+  @UseGuards(JwtGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.cardsService.remove(+id);
