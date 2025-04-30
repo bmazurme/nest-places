@@ -15,24 +15,37 @@ export class CardsService {
     private readonly cardRepository: Repository<Card>,
   ) {}
 
-  create(createCardDto: CreateCardDto, owner: User) {
-    return this.cardRepository.save({ ...createCardDto, user: owner });
+  create(createCardDto: CreateCardDto, user: User) {
+    return this.cardRepository.save({ ...createCardDto, user });
   }
 
   async findAll() {
     return await this.cardRepository.find({
       relations: {
         user: true,
-        like: true,
-        tags: true,
+        likes: {
+          user: true,
+        },
+        cardTags: {
+          tag: true,
+        },
       },
       select: {
         user: {
           id: true,
           name: true,
         },
-        tags: {
-          name: true,
+        cardTags: {
+          tagId: true,
+          tag: {
+            name: true,
+          },
+        },
+        likes: {
+          id: true,
+          user: {
+            id: true,
+          },
         },
       },
     });
@@ -43,17 +56,22 @@ export class CardsService {
       where: { id },
       relations: {
         user: true,
-        like: true,
-        tags: true,
+        likes: true,
+        cardTags: {
+          tag: true,
+        },
       },
       select: {
         user: {
           id: true,
           name: true,
         },
-        tags: {
-          name: true,
-        },
+        // cardTags: {
+        //   tagId: true,
+        //   // tag: {
+        //   //   name: true,
+        //   // },
+        // },
       },
     });
 
@@ -72,7 +90,6 @@ export class CardsService {
     return this.cardRepository.delete(id);
   }
 
-  // @Post('upload')
   upload(file: Express.Multer.File) {
     console.log(file);
     return null;
