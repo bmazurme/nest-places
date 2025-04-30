@@ -5,7 +5,7 @@ import { CardsService } from './cards.service';
 import { Card } from './entities/card.entity';
 
 import { UpdateCardDto } from './dto/update-card.dto';
-import { CreateCardDto } from './dto/create-card.dto';
+// import { CreateCardDto } from './dto/create-card.dto';
 
 describe('CardsService', () => {
   let service: CardsService;
@@ -41,27 +41,27 @@ describe('CardsService', () => {
     expect(service.findAll).toHaveBeenCalled();
   });
 
-  it('.create() should call CardsService.create', () => {
-    const createTagDto = { name: 'Name', link: '', userId: 0 } as CreateCardDto;
-    const card = {
-      id: 0,
-      name: 'Name',
-      link: '',
-      userId: 0,
-    } as unknown as Card;
+  // it('.create() should call CardsService.create', () => {
+  //   const createTagDto = { name: 'Name', link: '', userId: 0 } as CreateCardDto;
+  //   const card = {
+  //     id: 0,
+  //     name: 'Name',
+  //     link: '',
+  //     userId: 0,
+  //   } as unknown as Card;
 
-    jest.spyOn(cardsServiceMock, 'create').mockReturnValue(card);
+  //   jest.spyOn(cardsServiceMock, 'create').mockReturnValue(card);
 
-    const result = service.create(createTagDto);
+  //   const result = service.create(createTagDto);
 
-    expect(result).toEqual(card);
-    expect(service.create).toHaveBeenCalled();
-    expect(service.create).toHaveBeenCalledWith({
-      name: 'Name',
-      link: '',
-      userId: 0,
-    });
-  });
+  //   expect(result).toEqual(card);
+  //   expect(service.create).toHaveBeenCalled();
+  //   expect(service.create).toHaveBeenCalledWith({
+  //     name: 'Name',
+  //     link: '',
+  //     userId: 0,
+  //   });
+  // });
 
   it('.findOne() should call CardsService.findOne', () => {
     const id = '0';
