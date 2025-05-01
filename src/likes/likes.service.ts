@@ -13,8 +13,10 @@ export class LikesService {
     private readonly likeRepository: Repository<Like>,
   ) {}
 
-  like(createLikeDto: CreateLikeDto) {
-    return this.likeRepository.save(createLikeDto);
+  async like(createLikeDto: CreateLikeDto) {
+    const { id } = await this.likeRepository.save(createLikeDto);
+
+    return { id };
   }
 
   async dislike(createLikeDto: CreateLikeDto) {
@@ -27,6 +29,8 @@ export class LikesService {
       throw new NotFoundException('not found');
     }
 
-    return this.likeRepository.delete(like.id);
+    await this.likeRepository.delete(like.id);
+
+    return 'success';
   }
 }
