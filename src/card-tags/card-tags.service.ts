@@ -21,7 +21,7 @@ export class CardTagsService {
   findAll() {
     return this.cardTagRepository.find({
       relations: {
-        tag: true,
+        // tag: true,
       },
     });
   }
