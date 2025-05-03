@@ -8,8 +8,8 @@ describe('LikesService', () => {
   let service: LikesService;
 
   const likesServiceMock = {
-    create: jest.fn(),
-    remove: jest.fn(),
+    like: jest.fn(),
+    dislike: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -24,28 +24,30 @@ describe('LikesService', () => {
   });
 
   it('.create() should call LikesService.create', () => {
-    const createLikeDto = { name: 'Name' } as CreateLikeDto;
+    const createLikeDto = { card: { id: 1 }, user: { id: 1 } } as CreateLikeDto;
     const like = { id: 0 } as Like;
 
-    jest.spyOn(likesServiceMock, 'create').mockReturnValue(like);
+    jest.spyOn(likesServiceMock, 'like').mockReturnValue(like);
 
-    const result = service.create(createLikeDto);
+    const result = service.like(createLikeDto);
 
     expect(result).toEqual(like);
-    expect(service.create).toHaveBeenCalled();
-    expect(service.create).toHaveBeenCalledWith({ name: 'Name' });
+    expect(service.like).toHaveBeenCalled();
+    expect(service.like).toHaveBeenCalledWith({
+      card: { id: 1 },
+      user: { id: 1 },
+    });
   });
 
   it('.remove() should call LikesService.remove', async () => {
-    const id = '1';
-    const like = { id: 0 } as Like;
+    const like = { id: 1 } as Like;
 
-    jest.spyOn(likesServiceMock, 'remove').mockReturnValue(like);
+    jest.spyOn(likesServiceMock, 'dislike').mockReturnValue(like);
 
-    const result = service.remove(+id);
+    const result = service.dislike(like);
 
     expect(result).toEqual(like);
-    expect(service.remove).toHaveBeenCalled();
-    expect(service.remove).toHaveBeenCalledWith(+id);
+    expect(service.dislike).toHaveBeenCalled();
+    expect(service.dislike).toHaveBeenCalledWith(like);
   });
 });
