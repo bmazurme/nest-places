@@ -13,8 +13,8 @@ import { BaseEntity } from '../../base-entity';
 
 import { User } from '../../users/entities/user.entity';
 import { Like } from '../../likes/entities/like.entity';
-import { Tag } from 'src/tags/entities/tag.entity';
-import { CardTag } from 'src/card-tags/entities/card-tag.entity';
+import { Tag } from '../../tags/entities/tag.entity';
+import { CardTag } from '../../card-tags/entities/card-tag.entity';
 
 // import { GROUP_USER } from '../../base-entity';
 
