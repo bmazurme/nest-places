@@ -14,20 +14,37 @@ export class RolesService {
     private readonly roleRepository: Repository<Role>,
   ) {}
 
-  create(createRoleDto: CreateRoleDto) {
+  async create(createRoleDto: CreateRoleDto) {
+    const role = await this.roleRepository.findOne({
+      where: { name: createRoleDto.name },
+    });
+
+    if (role) {
+      throw new BadRequestException(
+        `role with name ${createRoleDto.name} exist`,
+      );
+    }
+
     return this.roleRepository.save(createRoleDto);
   }
 
   findAll() {
-    return this.roleRepository.find({});
+    return this.roleRepository.find({
+      select: {
+        id: true,
+        name: true,
+      },
+    });
   }
 
   async findOne(id: number) {
-    const role = await this.roleRepository.findOneBy({ id });
-
-    if (role) {
-      throw new BadRequestException(`role with id ${id} exist`);
-    }
+    const role = await this.roleRepository.findOne({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
 
     return role;
   }
