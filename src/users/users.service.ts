@@ -30,21 +30,41 @@ export class UsersService {
     return await this.userRepository.save(createUserDto);
   }
 
-  findAll() {
-    return this.userRepository.find({
-      relations: {
-        userRole: true,
-      },
-    });
+  async findAll() {
+    const users = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoin('user.userRoles', 'userRole')
+      .leftJoin('userRole.role', 'role')
+      .select([
+        'user.id as id',
+        'user.name as name',
+        'user.about as about',
+        'user.email as email',
+        'user.avatar as avatar',
+        'array_agg(role.name) as roles',
+      ])
+      .groupBy('user.id')
+      .getRawMany();
+
+    return users;
   }
 
   async findOne(id: number) {
-    const user = await this.userRepository.findOne({
-      where: { id },
-      relations: {
-        userRole: true,
-      },
-    });
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoin('user.userRoles', 'userRole')
+      .leftJoin('userRole.role', 'role')
+      .select([
+        'user.id as id',
+        'user.name as name',
+        'user.about as about',
+        'user.email as email',
+        'user.avatar as avatar',
+        'array_agg(role.name) as roles',
+      ])
+      .where('user.id = :id', { id })
+      .groupBy('user.id')
+      .getRawOne();
 
     if (!user) {
       throw new NotFoundException(`user with id ${id} not found`);
@@ -54,7 +74,16 @@ export class UsersService {
   }
 
   async findByEmail(email: string) {
-    return await this.userRepository.findOneBy({ email });
+    const [user] = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoin('user.userRoles', 'userRole')
+      .leftJoin('userRole.role', 'role')
+      .select(['user.id', 'array_agg(role.name) as roles'])
+      .where('user.email = :email', { email })
+      .groupBy('user.id')
+      .getRawMany();
+
+    return user;
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
