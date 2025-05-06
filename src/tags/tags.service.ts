@@ -19,11 +19,22 @@ export class TagsService {
   }
 
   findAll() {
-    return this.tagRepository.find();
+    return this.tagRepository.find({
+      select: {
+        id: true,
+        name: true,
+      },
+    });
   }
 
   async findOne(id: number) {
-    const tag = await this.tagRepository.findOneBy({ id });
+    const tag = await this.tagRepository.findOne({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
 
     if (!tag) {
       throw new NotFoundException(`tag with id ${id} not found`);
