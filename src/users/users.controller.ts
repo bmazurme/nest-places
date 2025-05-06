@@ -52,7 +52,6 @@ export class UsersController {
 
   @Get('email/:email')
   findByEmail(@Param('email') email: string): Promise<User> {
-    console.log(email);
     return this.usersService.findByEmail(email.toString());
   }
 
