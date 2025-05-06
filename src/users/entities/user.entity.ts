@@ -1,4 +1,4 @@
-import { Entity, Column, OneToMany } from 'typeorm';
+import { Entity, Column, OneToMany, JoinTable } from 'typeorm';
 import { Length, IsUrl, IsEmail } from 'class-validator';
 
 import { BaseEntity } from '../../base-entity';
@@ -6,14 +6,11 @@ import { Card } from '../../cards/entities/card.entity';
 import { UserRole } from '../../user-roles/entities/user-role.entity';
 import { Like } from '../../likes/entities/like.entity';
 
-// import { GROUP_USER } from '../../base-entity';
-
 @Entity()
 export class User extends BaseEntity {
   @Column({
     default: 'Guest',
   })
-  // @Expose({ groups: [GROUP_USER] })
   @Length(2, 30)
   name: string;
 
@@ -39,7 +36,8 @@ export class User extends BaseEntity {
   cards: Card[];
 
   @OneToMany(() => UserRole, (userRole) => userRole.user)
-  public userRole: UserRole[];
+  @JoinTable()
+  userRoles: UserRole[];
 
   @OneToMany(() => Like, (like) => like.user)
   likes: User;
