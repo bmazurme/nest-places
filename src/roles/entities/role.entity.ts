@@ -1,8 +1,9 @@
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
 import { Length } from 'class-validator';
 
 import { BaseEntity } from '../../base-entity';
 import { UserRole } from '../../user-roles/entities/user-role.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity()
 export class Role extends BaseEntity {
@@ -10,6 +11,10 @@ export class Role extends BaseEntity {
   @Length(2, 30)
   name: string;
 
-  @OneToMany(() => UserRole, (userRole) => userRole.id)
-  public userRole: UserRole[];
+  @ManyToMany(() => User, (user) => user.userRoles)
+  users: User[];
+
+  @OneToMany(() => UserRole, (userRole) => userRole.role)
+  @JoinTable()
+  userRoles: UserRole[];
 }
