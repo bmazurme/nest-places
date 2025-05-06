@@ -15,6 +15,9 @@ import {
 
 import { UsersService } from './users.service';
 
+import { Roles } from '../common/decorators/roles.decorator';
+import { Role } from '../common/decorators/role.enum';
+import { RolesGuard } from '../common/guards/roles.guard';
 import { JwtGuard } from '../oauth/jwt.guard';
 
 import { User } from './entities/user.entity';
@@ -23,7 +26,7 @@ import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
-@UseGuards(JwtGuard)
+@UseGuards(JwtGuard, RolesGuard)
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
@@ -47,10 +50,11 @@ export class UsersController {
     return this.usersService.findOne(+req.user.id);
   }
 
-  // @Get('/user')
-  // get() {
-  //   return this.usersService.get();
-  // }
+  @Get('email/:email')
+  findByEmail(@Param('email') email: string): Promise<User> {
+    console.log(email);
+    return this.usersService.findByEmail(email.toString());
+  }
 
   @Get(':id')
   findOneById(@Param('id') id: string) {
@@ -63,6 +67,7 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @Roles([Role.Admin])
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
   }
