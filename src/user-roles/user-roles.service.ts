@@ -19,11 +19,22 @@ export class UserRolesService {
   }
 
   findAll() {
-    return this.userRoleRepository.find();
+    return this.userRoleRepository.find({
+      select: {
+        userId: true,
+        roleId: true,
+      },
+    });
   }
 
   async findOne(id: number) {
-    const userRole = await this.userRoleRepository.findOneBy({ id });
+    const userRole = await this.userRoleRepository.findOne({
+      where: { id },
+      select: {
+        userId: true,
+        roleId: true,
+      },
+    });
 
     if (!userRole) {
       throw new NotFoundException(`user role with id ${id} not found`);
