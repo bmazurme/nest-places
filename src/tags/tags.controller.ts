@@ -8,17 +8,19 @@ import {
   Delete,
   UseInterceptors,
   ClassSerializerInterceptor,
-  // UseGuards,
+  UseGuards,
 } from '@nestjs/common';
 
+import { Roles } from '../common/decorators/roles.decorator';
+import { RolesGuard } from '../common/guards/roles.guard';
+
 import { TagsService } from './tags.service';
+import { JwtGuard } from '../oauth/jwt.guard';
 
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
 
-// import { JwtGuard } from 'src/oauth/jwt.guard';
-
-// @UseGuards(JwtGuard)
+@UseGuards(JwtGuard, RolesGuard)
 @Controller('tags')
 @UseInterceptors(ClassSerializerInterceptor)
 export class TagsController {
@@ -30,6 +32,7 @@ export class TagsController {
   }
 
   @Get()
+  @Roles(['admin'])
   findAll() {
     return this.tagsService.findAll();
   }
