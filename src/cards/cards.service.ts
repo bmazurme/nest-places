@@ -20,60 +20,42 @@ export class CardsService {
   }
 
   async findAll() {
-    return await this.cardRepository.find({
-      relations: {
-        user: true,
-        likes: {
-          user: true,
-        },
-        cardTags: {
-          tag: true,
-        },
-      },
-      select: {
-        user: {
-          id: true,
-          name: true,
-        },
-        cardTags: {
-          tagId: true,
-          tag: {
-            name: true,
-          },
-        },
-        likes: {
-          id: true,
-          user: {
-            id: true,
-          },
-        },
-      },
-    });
+    const cards = await this.cardRepository
+      .createQueryBuilder('card')
+      .leftJoin('card.cardTags', 'cardTag')
+      .leftJoin('cardTag.tag', 'tag')
+      .leftJoin('card.user', 'user')
+      .select([
+        'card.id as id',
+        'card.name as name',
+        'card.link as link',
+        'array_agg(tag.name) as tags',
+        "json_build_object('userId', user.id, 'userName', user.name) as \"user\"",
+      ])
+      .groupBy('card.id')
+      .addGroupBy('user.id')
+      .getRawMany();
+
+    return cards;
   }
 
   async findOne(id: number) {
-    const card = await this.cardRepository.findOne({
-      where: { id },
-      relations: {
-        user: true,
-        likes: true,
-        cardTags: {
-          tag: true,
-        },
-      },
-      select: {
-        user: {
-          id: true,
-          name: true,
-        },
-        // cardTags: {
-        //   tagId: true,
-        //   // tag: {
-        //   //   name: true,
-        //   // },
-        // },
-      },
-    });
+    const card = await this.cardRepository
+      .createQueryBuilder('card')
+      .leftJoin('card.cardTags', 'cardTag')
+      .leftJoin('cardTag.tag', 'tag')
+      .leftJoin('card.user', 'user')
+      .select([
+        'card.id as id',
+        'card.name as name',
+        'card.link as link',
+        'array_agg(tag.name) as tags',
+        "json_build_object('userId', user.id, 'userName', user.name) as \"user\"",
+      ])
+      .where('card.id = :id', { id })
+      .groupBy('card.id')
+      .addGroupBy('user.id')
+      .getRawOne();
 
     if (!card) {
       throw new NotFoundException(`card with id ${id} not found`);
@@ -88,10 +70,5 @@ export class CardsService {
 
   remove(id: number) {
     return this.cardRepository.delete(id);
-  }
-
-  upload(file: Express.Multer.File) {
-    console.log(file);
-    return null;
   }
 }
