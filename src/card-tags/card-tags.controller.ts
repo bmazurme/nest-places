@@ -10,10 +10,10 @@ import {
 } from '@nestjs/common';
 
 import { CardTagsService } from './card-tags.service';
+import { JwtGuard } from '../oauth/jwt.guard';
 
 import { CreateCardTagDto } from './dto/create-card-tag.dto';
 import { UpdateCardTagDto } from './dto/update-card-tag.dto';
-import { JwtGuard } from '../oauth/jwt.guard';
 
 @UseGuards(JwtGuard)
 @Controller('card-tags')
