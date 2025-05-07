@@ -1,4 +1,8 @@
-import { NotFoundException, Injectable } from '@nestjs/common';
+import {
+  NotFoundException,
+  Injectable,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -14,6 +18,14 @@ export class LikesService {
   ) {}
 
   async like(createLikeDto: CreateLikeDto) {
+    const like = await this.likeRepository.findOne({
+      where: { user: createLikeDto.user, card: createLikeDto.card },
+    });
+
+    if (like) {
+      throw new BadRequestException('found');
+    }
+
     const { id } = await this.likeRepository.save(createLikeDto);
 
     return { id };
