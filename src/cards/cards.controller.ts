@@ -11,20 +11,19 @@ import {
   Req,
   UseGuards,
   SerializeOptions,
-  UploadedFile,
   Put,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
 
 import { CardsService } from './cards.service';
 import { LikesService } from '../likes/likes.service';
+
 import { User } from '../users/entities/user.entity';
 import { GROUP_USER } from '../base-entity';
 
+import { JwtGuard } from '../oauth/jwt.guard';
+
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
-
-import { JwtGuard } from '../oauth/jwt.guard';
 
 @Controller('cards')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -63,7 +62,10 @@ export class CardsController {
   @UseGuards(JwtGuard)
   @Put(':id/like')
   like(@Param('id') id: string, @Req() req: { user: User }) {
-    return this.likesService.like({ card: { id: +id }, user: req.user });
+    return this.likesService.like({
+      card: { id: +id },
+      user: { id: req.user.id } as User,
+    });
   }
 
   @UseGuards(JwtGuard)
@@ -76,11 +78,5 @@ export class CardsController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.cardsService.remove(+id);
-  }
-
-  @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
-    return this.cardsService.upload(file);
   }
 }
