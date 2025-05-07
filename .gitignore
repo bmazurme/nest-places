@@ -36,3 +36,4 @@ postgresdata
 !.vscode/extensions.json
 
 .env
+/uploads
