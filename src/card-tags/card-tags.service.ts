@@ -23,6 +23,11 @@ export class CardTagsService {
       relations: {
         // tag: true,
       },
+      select: {
+        id: true,
+        cardId: true,
+        tagId: true,
+      },
     });
   }
 
