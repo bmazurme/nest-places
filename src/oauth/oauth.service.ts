@@ -29,7 +29,10 @@ export class OAuthService {
       await this.cacheManager.set(email, currentUser);
     }
 
-    const payload = { sub: currentUser.id };
+    const payload = {
+      sub: currentUser.id,
+      roles: (currentUser as User & { roles: string[] }).roles,
+    };
 
     return {
       access_token: this.jwtService.sign(payload),
