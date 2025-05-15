@@ -6,6 +6,8 @@ import {
   ValidateIf,
 } from 'class-validator';
 
+import { User } from '../../users/entities/user.entity';
+
 export class CreateCardDto {
   @IsString()
   @IsOptional()
@@ -16,4 +18,6 @@ export class CreateCardDto {
   @IsUrl()
   @IsOptional()
   link: string;
+
+  user: User;
 }
