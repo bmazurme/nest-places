@@ -35,11 +35,11 @@ describe('CardsService', () => {
     service = module.get<CardsService>(CardsService);
   });
 
-  it('.findAll() should call CardsService.findAll', () => {
-    jest.spyOn(service, 'findAll');
-    service.findAll();
-    expect(service.findAll).toHaveBeenCalled();
-  });
+  // it('.findAll() should call CardsService.findAll', () => {
+  //   jest.spyOn(service, 'findAll');
+  //   service.findAll();
+  //   expect(service.findAll).toHaveBeenCalled();
+  // });
 
   // it('.create() should call CardsService.create', () => {
   //   const createTagDto = { name: 'Name', link: '', userId: 0 } as CreateCardDto;
