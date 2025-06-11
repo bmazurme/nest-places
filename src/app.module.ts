@@ -9,14 +9,21 @@ import { UsersModule } from './users/users.module';
 import { TagsModule } from './tags/tags.module';
 import { CardsModule } from './cards/cards.module';
 import { LikesModule } from './likes/likes.module';
-import { CardTagsModule } from './card-tags/card-tags.module';
 import { RolesModule } from './roles/roles.module';
 import { UserRolesModule } from './user-roles/user-roles.module';
+import { CardTagsModule } from './card-tags/card-tags.module';
 
 import { TypeOrmModuleConfig } from './config';
+import { FilesModule } from './files/files.module';
+import { join } from 'path';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveStaticOptions: { index: false },
+    }),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModuleConfig,
     OAuthModule,
@@ -24,9 +31,10 @@ import { TypeOrmModuleConfig } from './config';
     TagsModule,
     CardsModule,
     LikesModule,
-    CardTagsModule,
     RolesModule,
     UserRolesModule,
+    CardTagsModule,
+    FilesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
