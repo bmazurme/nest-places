@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
+import { ApiOperation } from '@nestjs/swagger';
 
 import { RolesService } from './roles.service';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -24,6 +25,9 @@ import { UpdateRoleDto } from './dto/update-role.dto';
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
+  @ApiOperation({
+    summary: 'Create role',
+  })
   @Post()
   @Roles([Role.Admin])
   create(@Body() createRoleDto: CreateRoleDto) {
@@ -36,6 +40,9 @@ export class RolesController {
     return this.rolesService.findAll();
   }
 
+  @ApiOperation({
+    summary: 'Get role by ID',
+  })
   @Get(':id')
   @Roles([Role.Admin])
   findOne(@Param('id') id: string) {
@@ -48,6 +55,9 @@ export class RolesController {
     return this.rolesService.update(+id, updateRoleDto);
   }
 
+  @ApiOperation({
+    summary: 'Delete role by ID',
+  })
   @Delete(':id')
   @Roles([Role.Admin])
   remove(@Param('id') id: string) {
