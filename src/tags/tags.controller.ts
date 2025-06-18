@@ -10,6 +10,7 @@ import {
   // ClassSerializerInterceptor,
   UseGuards,
 } from '@nestjs/common';
+import { ApiOperation } from '@nestjs/swagger';
 
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -26,6 +27,9 @@ import { UpdateTagDto } from './dto/update-tag.dto';
 export class TagsController {
   constructor(private readonly tagsService: TagsService) {}
 
+  @ApiOperation({
+    summary: 'Create tag',
+  })
   @Post()
   create(@Body() createTagDto: CreateTagDto) {
     return this.tagsService.create(createTagDto);
@@ -37,6 +41,9 @@ export class TagsController {
     return this.tagsService.findAll();
   }
 
+  @ApiOperation({
+    summary: 'Get tag by ID',
+  })
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.tagsService.findOne(+id);
@@ -47,6 +54,9 @@ export class TagsController {
     return this.tagsService.update(+id, updateTagDto);
   }
 
+  @ApiOperation({
+    summary: 'Delete tag by ID',
+  })
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.tagsService.remove(+id);
