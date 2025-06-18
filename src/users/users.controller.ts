@@ -12,6 +12,7 @@ import {
   ClassSerializerInterceptor,
   UseGuards,
 } from '@nestjs/common';
+import { ApiOperation } from '@nestjs/swagger';
 
 import { UsersService } from './users.service';
 
@@ -38,13 +39,13 @@ export class UsersController {
   }
 
   @Get()
-  // @SerializeOptions({
-  //   groups: [GROUP_USER],
-  // })
   findAll(): Promise<User[]> {
     return this.usersService.findAll();
   }
 
+  @ApiOperation({
+    summary: 'Get user info',
+  })
   @Get('me')
   findOne(@Req() req: { user: User }): Promise<User> {
     return this.usersService.findOne(+req.user.id);
@@ -55,16 +56,25 @@ export class UsersController {
     return this.usersService.findByEmail(email.toString());
   }
 
+  @ApiOperation({
+    summary: 'Get user info by ID',
+  })
   @Get(':id')
   findOneById(@Param('id') id: string) {
     return this.usersService.findOne(+id);
   }
 
+  @ApiOperation({
+    summary: 'Change user profile',
+  })
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
   }
 
+  @ApiOperation({
+    summary: 'Delete user by ID',
+  })
   @Delete(':id')
   @Roles([Role.Admin])
   remove(@Param('id') id: string) {
