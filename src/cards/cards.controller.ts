@@ -13,6 +13,7 @@ import {
   SerializeOptions,
   Put,
 } from '@nestjs/common';
+import { ApiOperation } from '@nestjs/swagger';
 
 import { CardsService } from './cards.service';
 import { LikesService } from '../likes/likes.service';
@@ -33,12 +34,18 @@ export class CardsController {
     private readonly likesService: LikesService,
   ) {}
 
+  @ApiOperation({
+    summary: 'Create card',
+  })
   @UseGuards(JwtGuard)
   @Post()
   create(@Body() createCardDto: CreateCardDto, @Req() req: { user: User }) {
     return this.cardsService.create(createCardDto, req.user);
   }
 
+  @ApiOperation({
+    summary: 'Get cards',
+  })
   @UseGuards(JwtGuard)
   @Get()
   @SerializeOptions({
@@ -48,6 +55,9 @@ export class CardsController {
     return await this.cardsService.findAll();
   }
 
+  @ApiOperation({
+    summary: 'Get card by ID',
+  })
   @UseGuards(JwtGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
@@ -74,6 +84,9 @@ export class CardsController {
     return this.likesService.dislike({ card: { id: +id }, user: req.user });
   }
 
+  @ApiOperation({
+    summary: 'Delete card by ID',
+  })
   @UseGuards(JwtGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
