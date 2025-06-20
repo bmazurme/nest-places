@@ -6,8 +6,14 @@ import { Card } from '../../cards/entities/card.entity';
 import { UserRole } from '../../user-roles/entities/user-role.entity';
 import { Like } from '../../likes/entities/like.entity';
 
+/**
+ * User entity
+ */
 @Entity()
 export class User extends BaseEntity {
+  /**
+   * User name
+   */
   @Column({
     default: 'Guest',
   })
@@ -20,12 +26,18 @@ export class User extends BaseEntity {
   @Length(2, 200)
   about: string;
 
+  /**
+   * User avatar
+   */
   @Column({
     default: 'https://i.pravatar.cc/300',
   })
   @IsUrl()
   avatar: string;
 
+  /**
+   * User email
+   */
   @Column({
     unique: true,
   })
