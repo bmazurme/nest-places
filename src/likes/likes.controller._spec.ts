@@ -4,7 +4,7 @@
 // import { LikesService } from './likes.service';
 // import { Like } from './entities/like.entity';
 
-// // import { CreateLikeDto } from './dto/create-like.dto';
+// import { CreateLikeDto } from './dto/create-like.dto';
 
 // describe('LikesController', () => {
 //   let controller: LikesController;
@@ -28,29 +28,29 @@
 //     service = module.get<LikesService>(LikesService);
 //   });
 
-//   // it('.create() should call LikesService.create', () => {
-//   //   const createLikeDto = { name: 'Name' } as CreateLikeDto;
-//   //   const like = { id: 0 } as Like;
+//   it('.create() should call LikesService.create', () => {
+//     const createLikeDto = { name: 'Name' } as CreateLikeDto;
+//     const like = { id: 0 } as Like;
 
-//   //   jest.spyOn(likesServiceMock, 'create').mockReturnValue(like);
+//     jest.spyOn(likesServiceMock, 'create').mockReturnValue(like);
 
-//   //   const result = controller.create(createLikeDto);
+//     const result = controller.create(createLikeDto);
 
-//   //   expect(result).toEqual(like);
-//   //   expect(service.create).toHaveBeenCalled();
-//   //   expect(service.create).toHaveBeenCalledWith({ name: 'Name' });
-//   // });
+//     expect(result).toEqual(like);
+//     expect(service.create).toHaveBeenCalled();
+//     expect(service.create).toHaveBeenCalledWith({ name: 'Name' });
+//   });
 
-//   // it('.remove() should call LikesService.remove', async () => {
-//   //   const id = '1';
-//   //   const like = { id: 0 } as Like;
+//   it('.remove() should call LikesService.remove', async () => {
+//     const id = '1';
+//     const like = { id: 0 } as Like;
 
-//   //   jest.spyOn(likesServiceMock, 'remove').mockReturnValue(like);
+//     jest.spyOn(likesServiceMock, 'remove').mockReturnValue(like);
 
-//   //   const result = controller.remove(id);
+//     const result = controller.remove(id);
 
-//   //   expect(result).toEqual(like);
-//   //   expect(service.dislike).toHaveBeenCalled();
-//   //   expect(service.dislike).toHaveBeenCalledWith(+id);
-//   // });
+//     expect(result).toEqual(like);
+//     expect(service.dislike).toHaveBeenCalled();
+//     expect(service.dislike).toHaveBeenCalledWith(+id);
+//   });
 // });
