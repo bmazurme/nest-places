@@ -27,6 +27,9 @@ import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
+/**
+ * User controller
+ */
 @UseGuards(JwtGuard, RolesGuard)
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -38,11 +41,17 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
+  /**
+   * Get users
+   */
   @Get()
   findAll(): Promise<User[]> {
     return this.usersService.findAll();
   }
 
+  /**
+   * Get current users
+   */
   @ApiOperation({
     summary: 'Get user info',
   })
@@ -51,11 +60,19 @@ export class UsersController {
     return this.usersService.findOne(+req.user.id);
   }
 
+  /**
+   * Get user by email
+   * @param email User email
+   */
   @Get('email/:email')
   findByEmail(@Param('email') email: string): Promise<User> {
     return this.usersService.findByEmail(email.toString());
   }
 
+  /**
+   * Get user by Id
+   * @param id User userId
+   */
   @ApiOperation({
     summary: 'Get user info by ID',
   })
@@ -64,14 +81,23 @@ export class UsersController {
     return this.usersService.findOne(+id);
   }
 
+  /**
+   * Update a user
+   * @param userId User id
+   * @param userData User data
+   */
   @ApiOperation({
     summary: 'Change user profile',
   })
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  update(@Param('id') id: string, @Body() userData: UpdateUserDto) {
+    return this.usersService.update(+id, userData);
   }
 
+  /**
+   * Delete a user
+   * @param params
+   */
   @ApiOperation({
     summary: 'Delete user by ID',
   })
