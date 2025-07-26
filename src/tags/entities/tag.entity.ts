@@ -1,9 +1,9 @@
-import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
 import { Length } from 'class-validator';
 
 import { BaseEntity } from '../../base-entity';
+
 import { Card } from '../../cards/entities/card.entity';
-import { CardTag } from '../../card-tags/entities/card-tag.entity';
 
 /**
  * Entity class representing a tag in the system.
@@ -32,17 +32,10 @@ export class Tag extends BaseEntity {
    * @example [Card { id: 1 }, Card { id: 2 }]
    */
   @ManyToMany(() => Card, (card) => card.tags)
+  @JoinTable({
+    name: 'cardTags',
+    joinColumn: { name: 'tagId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'cardId', referencedColumnName: 'id' },
+  })
   cards: Card[];
-
-  /**
-   * Card-tag relationships
-   * @type {CardTag[]}
-   * @description Collection of card-tag associations
-   * @relationship One-to-Many with CardTag entity
-   * @joinTable Uses a join table for the relationship
-   * @example [CardTag { id: 1, cardId: 1, tagId: 1 }]
-   */
-  @OneToMany(() => CardTag, (cardTag) => cardTag.tag)
-  @JoinTable()
-  cardTags: CardTag[];
 }
