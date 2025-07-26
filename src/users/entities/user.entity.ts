@@ -1,10 +1,10 @@
-import { Entity, Column, OneToMany, JoinTable } from 'typeorm';
+import { Entity, Column, OneToMany, JoinTable, ManyToMany } from 'typeorm';
 import { Length, IsUrl, IsEmail } from 'class-validator';
 
 import { BaseEntity } from '../../base-entity';
 import { Card } from '../../cards/entities/card.entity';
-import { UserRole } from '../../user-roles/entities/user-role.entity';
 import { Like } from '../../likes/entities/like.entity';
+import { Role } from '../../roles/entities/role.entity';
 
 /**
  * User entity
@@ -47,9 +47,13 @@ export class User extends BaseEntity {
   @OneToMany(() => Card, (card) => card.user)
   cards: Card[];
 
-  @OneToMany(() => UserRole, (userRole) => userRole.user)
-  @JoinTable()
-  userRoles: UserRole[];
+  @ManyToMany(() => Role, (role) => role.users)
+  @JoinTable({
+    name: 'user_roles',
+    joinColumn: { name: 'user_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'role_id', referencedColumnName: 'id' },
+  })
+  roles: Role[];
 
   @OneToMany(() => Like, (like) => like.user)
   likes: User;
