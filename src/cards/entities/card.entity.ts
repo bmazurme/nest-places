@@ -13,7 +13,6 @@ import { BaseEntity } from '../../base-entity';
 import { User } from '../../users/entities/user.entity';
 import { Like } from '../../likes/entities/like.entity';
 import { Tag } from '../../tags/entities/tag.entity';
-import { CardTag } from '../../card-tags/entities/card-tag.entity';
 
 /**
  * Entity class representing a card in the system.
@@ -78,18 +77,10 @@ export class Card extends BaseEntity {
    * @joinTable Uses a join table for the relationship
    */
   @ManyToMany(() => Tag, (tag) => tag.cards)
-  @JoinTable()
+  @JoinTable({
+    name: 'cardTags',
+    joinColumn: { name: 'cardId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'tagId', referencedColumnName: 'id' },
+  })
   tags: Tag[];
-
-  /**
-   * Card-tag relationships
-   * @type {CardTag[]}
-   * @description Collection of card-tag associations
-   * @example [CardTag { id: 1, cardId: 1, tagId: 1 }, CardTag { id: 2, cardId: 1, tagId: 2 }]
-   * @relationship One-to-Many with CardTag entity
-   * @joinTable Uses a join table for the relationship
-   */
-  @OneToMany(() => CardTag, (cardTag) => cardTag.card)
-  @JoinTable()
-  cardTags: CardTag[];
 }
