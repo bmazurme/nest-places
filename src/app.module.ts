@@ -10,8 +10,6 @@ import { TagsModule } from './tags/tags.module';
 import { CardsModule } from './cards/cards.module';
 import { LikesModule } from './likes/likes.module';
 import { RolesModule } from './roles/roles.module';
-import { UserRolesModule } from './user-roles/user-roles.module';
-import { CardTagsModule } from './card-tags/card-tags.module';
 
 import { TypeOrmModuleConfig } from './config';
 import { FilesModule } from './files/files.module';
@@ -32,8 +30,6 @@ import { ServeStaticModule } from '@nestjs/serve-static';
     CardsModule,
     LikesModule,
     RolesModule,
-    UserRolesModule,
-    CardTagsModule,
     FilesModule,
   ],
   controllers: [AppController],
