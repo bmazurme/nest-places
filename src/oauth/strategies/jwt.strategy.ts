@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 /**
@@ -17,7 +18,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
    */
   constructor(private readonly configService: ConfigService) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      // jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: (request) => {
+        const token = request.cookies?.access_token;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return token;
+      },
       secretOrKey: configService.get('JWT_SECRET') ?? 'SECRET',
     });
   }
