@@ -1,4 +1,11 @@
-import { Entity, Column, OneToMany, JoinTable, ManyToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  OneToMany,
+  JoinTable,
+  ManyToMany,
+  EntityManager,
+} from 'typeorm';
 import { Length, IsUrl, IsEmail } from 'class-validator';
 
 import { BaseEntity } from '../../base-entity';
@@ -57,4 +64,15 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Like, (like) => like.user)
   likes: User;
+
+  async updateRoles(newRoles: Role[], manager: EntityManager): Promise<void> {
+    try {
+      this.roles = [];
+      this.roles = newRoles;
+      await manager.save(this);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      throw new Error('Не удалось обновить роли пользователя');
+    }
+  }
 }
