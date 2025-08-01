@@ -14,6 +14,7 @@ import { ApiOperation } from '@nestjs/swagger';
 
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
+import { Role } from '../common/decorators/role.enum';
 
 import { TagsService } from './tags.service';
 import { JwtGuard } from '../oauth/jwt.guard';
@@ -36,7 +37,8 @@ export class TagsController {
   }
 
   @Get()
-  @Roles(['admin'])
+  @Roles([Role.Admin])
+  // @UseGuards(RolesGuard)
   findAll() {
     return this.tagsService.findAll();
   }
