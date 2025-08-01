@@ -11,6 +11,7 @@ import { User } from './entities/user.entity';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Role } from '../roles/entities/role.entity';
 
 @Injectable()
 export class UsersService {
@@ -31,40 +32,16 @@ export class UsersService {
   }
 
   async findAll() {
-    const users = await this.userRepository
-      .createQueryBuilder('user')
-      .leftJoin('user.userRoles', 'userRole')
-      .leftJoin('userRole.role', 'role')
-      .select([
-        'user.id as id',
-        'user.name as name',
-        'user.about as about',
-        'user.email as email',
-        'user.avatar as avatar',
-        'array_agg(role.name) as roles',
-      ])
-      .groupBy('user.id')
-      .getRawMany();
-
-    return users;
+    return await this.userRepository.find({
+      relations: ['roles'],
+    });
   }
 
   async findOne(id: number) {
-    const user = await this.userRepository
-      .createQueryBuilder('user')
-      .leftJoin('user.userRoles', 'userRole')
-      .leftJoin('userRole.role', 'role')
-      .select([
-        'user.id as id',
-        'user.name as name',
-        'user.about as about',
-        'user.email as email',
-        'user.avatar as avatar',
-        'array_agg(role.name) as roles',
-      ])
-      .where('user.id = :id', { id })
-      .groupBy('user.id')
-      .getRawOne();
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: ['roles'],
+    });
 
     if (!user) {
       throw new NotFoundException(`user with id ${id} not found`);
@@ -74,20 +51,31 @@ export class UsersService {
   }
 
   async findByEmail(email: string) {
-    const [user] = await this.userRepository
-      .createQueryBuilder('user')
-      .leftJoin('user.userRoles', 'userRole')
-      .leftJoin('userRole.role', 'role')
-      .select(['user.id', 'array_agg(role.name) as roles'])
-      .where('user.email = :email', { email })
-      .groupBy('user.id')
-      .getRawMany();
-
-    return user;
+    return await this.userRepository.findOne({
+      where: { email },
+      relations: ['roles'],
+      select: {
+        id: true,
+        name: true,
+      },
+    });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return this.userRepository.update(+id, updateUserDto);
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: ['roles'],
+    });
+
+    if (user?.roles) {
+      const role = new Role();
+      role.id = updateUserDto.role.id;
+      role.name = updateUserDto.role.name;
+
+      await user.updateRoles([role], this.userRepository.manager);
+    }
+
+    return user;
   }
 
   remove(id: number) {
