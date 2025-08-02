@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
+import { Response } from 'express';
 
 // import { HashService } from '../hash/hash.service';
 import { UsersService } from '../users/users.service';
@@ -16,7 +17,7 @@ export class OAuthService {
     // private readonly hashService: HashService,
   ) {}
 
-  async signinOrSignup({ email }: User) {
+  async signinOrSignup({ email }: User, response: Response) {
     let currentUser: User | null = await this.cacheManager.get(email);
 
     if (!currentUser) {
@@ -31,11 +32,21 @@ export class OAuthService {
 
     const payload = {
       sub: currentUser.id,
-      roles: (currentUser as User & { roles: string[] }).roles,
+      roles: (currentUser as User & { roles: string[] }).roles.map(
+        ({ name }) => name,
+      ),
     };
 
-    return {
+    // return {
+    //   access_token: this.jwtService.sign(payload),
+    // };
+    response.cookie('access_token', this.jwtService.sign(payload), {
+      httpOnly: true,
+      maxAge: 3600000,
+    });
+
+    response.send({
       access_token: this.jwtService.sign(payload),
-    };
+    });
   }
 }
