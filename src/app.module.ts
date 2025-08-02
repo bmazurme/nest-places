@@ -14,7 +14,7 @@ import { LikesModule } from './likes/likes.module';
 import { RolesModule } from './roles/roles.module';
 import { FilesModule } from './files/files.module';
 
-import { TypeOrmModuleConfig } from './config';
+import { TypeOrmModuleConfig } from './common/configs';
 
 @Module({
   imports: [
