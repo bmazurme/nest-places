@@ -20,42 +20,16 @@ export class CardsService {
   }
 
   async findAll() {
-    const cards = await this.cardRepository
-      .createQueryBuilder('card')
-      .leftJoin('card.cardTags', 'cardTag')
-      .leftJoin('cardTag.tag', 'tag')
-      .leftJoin('card.user', 'user')
-      .select([
-        'card.id as id',
-        'card.name as name',
-        'card.link as link',
-        'array_agg(tag.name) as tags',
-        "json_build_object('userId', user.id, 'userName', user.name) as \"user\"",
-      ])
-      .groupBy('card.id')
-      .addGroupBy('user.id')
-      .getRawMany();
-
-    return cards;
+    return await this.cardRepository.find({
+      relations: ['tags'],
+    });
   }
 
   async findOne(id: number) {
-    const card = await this.cardRepository
-      .createQueryBuilder('card')
-      .leftJoin('card.cardTags', 'cardTag')
-      .leftJoin('cardTag.tag', 'tag')
-      .leftJoin('card.user', 'user')
-      .select([
-        'card.id as id',
-        'card.name as name',
-        'card.link as link',
-        'array_agg(tag.name) as tags',
-        "json_build_object('userId', user.id, 'userName', user.name) as \"user\"",
-      ])
-      .where('card.id = :id', { id })
-      .groupBy('card.id')
-      .addGroupBy('user.id')
-      .getRawOne();
+    const card = await this.cardRepository.find({
+      where: { id },
+      relations: ['tags'],
+    });
 
     if (!card) {
       throw new NotFoundException(`card with id ${id} not found`);
