@@ -7,7 +7,6 @@ import {
   Param,
   Delete,
   Req,
-  // SerializeOptions,
   UseInterceptors,
   ClassSerializerInterceptor,
   UseGuards,
@@ -22,7 +21,6 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { JwtGuard } from '../oauth/jwt.guard';
 
 import { User } from './entities/user.entity';
-// import { GROUP_USER } from '../base-entity';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -89,9 +87,9 @@ export class UsersController {
   @ApiOperation({
     summary: 'Change user profile',
   })
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() userData: UpdateUserDto) {
-    return this.usersService.update(+id, userData);
+  @Patch('me')
+  update(@Body() userData: UpdateUserDto) {
+    return this.usersService.update(userData);
   }
 
   /**
