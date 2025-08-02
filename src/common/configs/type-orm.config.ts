@@ -1,11 +1,11 @@
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
-import { Tag } from '../tags/entities/tag.entity';
-import { Role } from '../roles/entities/role.entity';
-import { Like } from '../likes/entities/like.entity';
-import { Card } from '../cards/entities/card.entity';
-import { User } from '../users/entities/user.entity';
+import { Tag } from '../../tags/entities/tag.entity';
+import { Role } from '../../roles/entities/role.entity';
+import { Like } from '../../likes/entities/like.entity';
+import { Card } from '../../cards/entities/card.entity';
+import { User } from '../../users/entities/user.entity';
 
 export const TypeOrmModuleConfig = TypeOrmModule.forRootAsync({
   imports: [ConfigModule],
