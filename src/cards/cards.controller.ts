@@ -151,4 +151,20 @@ export class CardsController {
   remove(@Param('id') id: string) {
     return this.cardsService.remove(+id);
   }
+
+  @UseGuards(JwtGuard)
+  @Get('count/:id')
+  async getCount(@Param('id') id: string) {
+    return this.cardsService.getCount(+id);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('user/:userId/page/:page')
+  async getCardsByUser(
+    @Param('userId') userId: string,
+    @Param('page') page: string,
+    @Req() req: { user: User },
+  ) {
+    return this.cardsService.getCardsByUser(+userId, +page, req.user);
+  }
 }
