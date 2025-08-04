@@ -15,7 +15,7 @@ import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Role } from '../common/decorators/role.enum';
 
-import { JwtGuard } from '../oauth/jwt.guard';
+import { JwtGuard } from '../common/guards/jwt.guard';
 
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
