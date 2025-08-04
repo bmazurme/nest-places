@@ -8,7 +8,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { User } from './entities/user.entity';
-import { Role } from '../roles/entities/role.entity';
+// import { Role } from '../roles/entities/role.entity';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -33,7 +33,13 @@ export class UsersService {
 
   async findAll() {
     return await this.userRepository.find({
-      relations: ['roles'],
+      // relations: ['roles'],
+      select: {
+        id: true,
+        name: true,
+        about: true,
+        avatar: true,
+      },
     });
   }
 
@@ -45,6 +51,17 @@ export class UsersService {
 
     if (!user) {
       throw new NotFoundException(`user with id ${id} not found`);
+    }
+
+    return user;
+  }
+  async findByAvatar(fileName: string) {
+    const user = await this.userRepository.findOne({
+      where: { avatar: fileName },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`user with avatar ${fileName} not found`);
     }
 
     return user;
@@ -61,21 +78,25 @@ export class UsersService {
     });
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
-    const user = await this.userRepository.findOne({
-      where: { id },
-      relations: ['roles'],
+  async update(updateUserDto: UpdateUserDto) {
+    return this.userRepository.update(updateUserDto.id, {
+      name: updateUserDto.name,
+      about: updateUserDto.about,
     });
+    // const user = await this.userRepository.findOne({
+    //   where: { id },
+    //   relations: ['roles'],
+    // });
 
-    if (user?.roles) {
-      const role = new Role();
-      role.id = updateUserDto.role.id;
-      role.name = updateUserDto.role.name;
+    // if (user?.roles) {
+    //   const role = new Role();
+    //   role.id = updateUserDto.role.id;
+    //   role.name = updateUserDto.role.name;
 
-      await user.updateRoles([role], this.userRepository.manager);
-    }
+    //   await user.updateRoles([role], this.userRepository.manager);
+    // }
 
-    return user;
+    // return user;
   }
 
   remove(id: number) {
