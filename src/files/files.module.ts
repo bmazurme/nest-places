@@ -8,9 +8,11 @@ import { User } from '../users/entities/user.entity';
 
 import { FilesService } from './files.service';
 import { FilesController } from './files.controller';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
+    UsersModule,
     MulterModule.register({
       storage: diskStorage({
         destination: './uploads',
