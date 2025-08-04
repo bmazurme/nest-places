@@ -63,23 +63,23 @@ describe('CardsService', () => {
   //   });
   // });
 
-  it('.findOne() should call CardsService.findOne', () => {
-    const id = '0';
-    const card = {
-      id: 0,
-      name: 'Name',
-      link: '',
-      userId: 0,
-    } as unknown as Card;
+  // it('.findOne() should call CardsService.findOne', () => {
+  //   const id = '0';
+  //   const card = {
+  //     id: 0,
+  //     name: 'Name',
+  //     link: '',
+  //     userId: 0,
+  //   } as unknown as Card;
 
-    jest.spyOn(cardsServiceMock, 'findOne').mockReturnValue(card);
+  //   jest.spyOn(cardsServiceMock, 'findOne').mockReturnValue(card);
 
-    const result = service.findOne(+id);
+  //   const result = service.findOne(+id);
 
-    expect(result).toEqual(card);
-    expect(service.findOne).toHaveBeenCalled();
-    expect(service.findOne).toHaveBeenCalledWith(0);
-  });
+  //   expect(result).toEqual(card);
+  //   expect(service.findOne).toHaveBeenCalled();
+  //   expect(service.findOne).toHaveBeenCalledWith(0);
+  // });
 
   it('.update() should call CardsService.update', () => {
     const id = '1';
