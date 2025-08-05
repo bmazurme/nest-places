@@ -27,6 +27,22 @@ export class TagsService {
     });
   }
 
+  async findByNameOrCreate(name: string) {
+    const tag = await this.tagRepository.findOne({
+      where: { name },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+
+    if (!tag) {
+      return await this.create({ name });
+    }
+
+    return tag;
+  }
+
   async findOne(id: number) {
     const tag = await this.tagRepository.findOne({
       where: { id },
