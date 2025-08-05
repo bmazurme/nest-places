@@ -7,11 +7,14 @@ import {
   UploadedFile,
   UseGuards,
   Req,
+  Get,
+  Res,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Response } from 'express';
 
 import { FilesService } from './files.service';
-import { JwtGuard } from '../oauth/jwt.guard';
+import { JwtGuard } from '../common/guards/jwt.guard';
 
 import { User } from '../users/entities/user.entity';
 import { ApiResponse } from '@nestjs/swagger';
@@ -21,7 +24,7 @@ import { ApiResponse } from '@nestjs/swagger';
  * Handles file upload and deletion operations.
  * Requires JWT authentication for all endpoints.
  */
-@UseGuards(JwtGuard)
+// @UseGuards(JwtGuard)
 @Controller('files')
 export class FilesController {
   /**
@@ -45,6 +48,7 @@ export class FilesController {
    * 404:
    * description: File not found
    */
+  @UseGuards(JwtGuard)
   @Delete(':name')
   @ApiResponse({ status: 200, description: 'File deleted successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -71,6 +75,7 @@ export class FilesController {
    * 400:
    * description: Invalid file
    */
+  @UseGuards(JwtGuard)
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   @ApiResponse({ status: 201, description: 'File uploaded successfully' })
@@ -78,5 +83,29 @@ export class FilesController {
   @ApiResponse({ status: 400, description: 'Invalid file' })
   uploadFile(@UploadedFile() file: Express.Multer.File) {
     return this.filesService.uploadFile(file);
+  }
+
+  @Get('avatar/:fileName')
+  async getAvatarFile(
+    @Param('fileName') fileName: string,
+    @Res() response: Response,
+  ) {
+    return this.filesService.getAvatarFile(fileName, response);
+  }
+
+  @Get('covers/:coverName')
+  async getCoverFile(
+    @Param('coverName') coverName: string,
+    @Res() response: Response,
+  ) {
+    return this.filesService.getCoverFile(coverName, response);
+  }
+
+  @Get(':fileName')
+  async getFile(
+    @Param('fileName') fileName: string,
+    @Res() response: Response,
+  ) {
+    return this.filesService.getFile(fileName, response);
   }
 }
