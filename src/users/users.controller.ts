@@ -18,7 +18,7 @@ import { UsersService } from './users.service';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '../common/decorators/role.enum';
 import { RolesGuard } from '../common/guards/roles.guard';
-import { JwtGuard } from '../oauth/jwt.guard';
+import { JwtGuard } from '../common/guards/jwt.guard';
 
 import { User } from './entities/user.entity';
 
