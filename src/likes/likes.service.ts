@@ -19,7 +19,10 @@ export class LikesService {
 
   async like(createLikeDto: CreateLikeDto) {
     const like = await this.likeRepository.findOne({
-      where: { user: createLikeDto.user, card: createLikeDto.card },
+      where: {
+        card: createLikeDto.card,
+        user: { id: createLikeDto.user.id },
+      },
     });
 
     if (like) {
@@ -33,7 +36,10 @@ export class LikesService {
 
   async dislike(createLikeDto: CreateLikeDto) {
     const like = await this.likeRepository.findOne({
-      where: { ...createLikeDto },
+      where: {
+        card: createLikeDto.card,
+        user: { id: createLikeDto.user.id },
+      },
       select: { id: true },
     });
 
@@ -41,8 +47,8 @@ export class LikesService {
       throw new NotFoundException('not found');
     }
 
-    await this.likeRepository.delete(like.id);
+    return await this.likeRepository.delete(like.id);
 
-    return 'success';
+    // return 'success';
   }
 }
