@@ -9,8 +9,8 @@ import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class FilesService {
-  private readonly coversPath = 'covers';
-  private readonly slidesPath = 'slides';
+  // private readonly coversPath = 'covers';
+  // private readonly slidesPath = 'slides';
 
   constructor(private readonly usersService: UsersService) {}
 
@@ -79,6 +79,22 @@ export class FilesService {
     response
       .set('Cache-Control', 'public, max-age=31557600')
       .sendFile(join(__dirname, '..', '..', 'uploads', 'target', fileName));
+  }
+
+  async updateAvatar(file: Express.Multer.File, user: User) {
+    const current = await this.usersService.findOne(user.id);
+    const targetPath = join(__dirname, '..', '..', 'uploads', 'avatars');
+    const avatarName = join(targetPath, current.avatar);
+
+    await sharp(file.buffer)
+      .resize({
+        width: 240,
+        height: 240,
+      })
+      .toFormat('webp')
+      .toFile(avatarName);
+
+    return current;
   }
 
   //   export const getCoverFile = async (req: Request, res: Response, next: NextFunction) => {
