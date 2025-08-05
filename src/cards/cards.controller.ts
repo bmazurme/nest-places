@@ -21,7 +21,8 @@ import { LikesService } from '../likes/likes.service';
 import { User } from '../users/entities/user.entity';
 import { GROUP_USER } from '../base-entity';
 
-import { JwtGuard } from '../oauth/jwt.guard';
+import { JwtGuard } from '../common/guards/jwt.guard';
+import { CustomJwtGuard } from '../common/guards/custom.jwt.guard';
 
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
@@ -81,23 +82,6 @@ export class CardsController {
   }
 
   /**
-   * Finds a card by ID
-   * @param id ID of the card to find
-   * @returns Found card
-   */
-  @ApiOperation({
-    summary: 'Get card by ID',
-  })
-  @UseGuards(JwtGuard)
-  @Get(':id')
-  @ApiResponse({ status: 200, description: 'Card retrieved successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 404, description: 'Card not found' })
-  findOne(@Param('id') id: string) {
-    return this.cardsService.findOne(+id);
-  }
-
-  /**
    * Updates an existing card
    * @param id ID of the card to update
    * @param updateCardDto DTO containing updated card data
@@ -118,12 +102,13 @@ export class CardsController {
    * @returns Like operation result
    */
   @UseGuards(JwtGuard)
-  @Put(':id/like')
-  like(@Param('id') id: string, @Req() req: { user: User }) {
-    return this.likesService.like({
-      card: { id: +id },
-      user: { id: req.user.id } as User,
-    });
+  @Put(':id/likes')
+  async like(@Param('id') id: string, @Req() req: { user: User }) {
+    // return this.likesService.like({
+    //   card: { id: +id },
+    //   user: { id: req.user.id } as User,
+    // });
+    return await this.cardsService.likeCard({ id: +id }, req.user);
   }
 
   /**
@@ -133,9 +118,10 @@ export class CardsController {
    * @returns Dislike operation result
    */
   @UseGuards(JwtGuard)
-  @Delete(':id/like')
-  dislike(@Param('id') id: string, @Req() req: { user: User }) {
-    return this.likesService.dislike({ card: { id: +id }, user: req.user });
+  @Delete(':id/likes')
+  async dislike(@Param('id') id: string, @Req() req: { user: User }) {
+    // return this.likesService.dislike({ card: { id: +id }, user: req.user });
+    return await this.cardsService.dislikeCard({ id: +id }, req.user);
   }
 
   /**
@@ -166,5 +152,51 @@ export class CardsController {
     @Req() req: { user: User },
   ) {
     return this.cardsService.getCardsByUser(+userId, +page, req.user);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('tag/:tagName/page/:page')
+  async getCardsByTag(
+    @Param('tagName') tagName: string,
+    @Param('page') page: string,
+    @Req() req: { user: User },
+  ) {
+    return this.cardsService.getCardsByTag(tagName, +page, req.user);
+  }
+
+  @UseGuards(CustomJwtGuard)
+  @Get('page/:page')
+  async getCardsByPage(
+    @Param('page') page: string,
+    @Req() req: { userId: number },
+  ) {
+    return this.cardsService.getCardsByPage(+page, req.userId);
+  }
+
+  // @UseGuards(JwtGuard)
+  // @Get('tag/:tagName/page/:page')
+  // async getCardById(
+  //   @Param('tagName') tagName: string,
+  //   @Param('page') page: string,
+  //   @Req() req: { user: User },
+  // ) {
+  //   return this.cardsService.getCardById(tagName, +page, req.user);
+  // }
+
+  /**
+   * Finds a card by ID
+   * @param id ID of the card to find
+   * @returns Found card
+   */
+  @ApiOperation({
+    summary: 'Get card by ID',
+  })
+  @UseGuards(JwtGuard)
+  @Get(':id')
+  @ApiResponse({ status: 200, description: 'Card retrieved successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Card not found' })
+  findOne(@Param('id') id: string, @Req() req: { user: User }) {
+    return this.cardsService.getCardById(+id, req.user.id);
   }
 }
