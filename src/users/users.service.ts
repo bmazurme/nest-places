@@ -99,6 +99,12 @@ export class UsersService {
     // return user;
   }
 
+  async updateAvatar(updateUserDto: { id: number; avatar: string }) {
+    return this.userRepository.update(updateUserDto.id, {
+      avatar: updateUserDto.avatar,
+    });
+  }
+
   remove(id: number) {
     return this.userRepository.delete(id);
   }
