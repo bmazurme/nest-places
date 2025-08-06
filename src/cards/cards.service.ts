@@ -69,7 +69,7 @@ export class CardsService {
 
     return this.cardRepository.query(
       `
-        SELECT t.id, t.name, t.link, t."userId" "userId", t.count::int, t."isLiked", u.name userName
+        SELECT t.id, t.name, t.link, t."userId" "userid", t.count::int, t."isLiked", u.name userName
         FROM (SELECT c.id, c.name, c.link, c."userId", COUNT(l."cardId") as count, bool_or(l."userId" = $2) as "isLiked"
             FROM card c
             LEFT JOIN "like" l ON c.id = l."cardId"
