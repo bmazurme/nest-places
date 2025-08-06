@@ -41,7 +41,7 @@ export class FilesService {
       .resize(1000, 1000)
       .toFile(fileSourcePath);
 
-    return { message: 'File uploaded successfully', link: file.filename };
+    return { message: 'File uploaded successfully', link: fileName };
   }
 
   removeFile(name: string, user: User) {
@@ -87,8 +87,6 @@ export class FilesService {
     const uniqName = `user_${user.id}_${uuidv4()}.webp`.toLowerCase();
     const targetPath = join(__dirname, '..', '..', 'uploads', 'avatars');
     const avatarName = join(targetPath, uniqName);
-
-    // console.log(file.originalname, current.avatar);
 
     unlink(
       join(__dirname, '..', '..', 'uploads', 'avatars', current.avatar),
