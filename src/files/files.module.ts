@@ -44,5 +44,6 @@ import { UsersModule } from '../users/users.module';
   ],
   controllers: [FilesController],
   providers: [FilesService],
+  exports: [FilesService],
 })
 export class FilesModule {}
