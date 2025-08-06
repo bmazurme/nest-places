@@ -48,4 +48,5 @@ export class CreateCardDto {
    * @example User { id: 1, username: 'john_doe' }
    */
   user: User;
+  tagName: string;
 }
