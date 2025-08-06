@@ -1,8 +1,8 @@
 import { PartialType } from '@nestjs/mapped-types';
 
 import { CreateUserDto } from './create-user.dto';
-import { Role } from '../../roles/entities/role.entity';
-import { ApiProperty } from '@nestjs/swagger';
+// import { Role } from '../../roles/entities/role.entity';
+// import { ApiProperty } from '@nestjs/swagger';
 
 /**
  * DTO для обновления пользователя
@@ -17,8 +17,11 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
    * @description Новая роль пользователя, которую можно обновить
    * @type {Role}
    */
-  @ApiProperty({
-    description: 'Роль пользователя в системе',
-  })
-  role: Role;
+  // @ApiProperty({
+  //   description: 'Роль пользователя в системе',
+  // })
+  // role: Role;
+  id: number;
+  name: string;
+  about: string;
 }
