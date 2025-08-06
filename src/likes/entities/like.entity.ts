@@ -10,7 +10,10 @@ import { User } from '../../users/entities/user.entity';
  */
 @Entity()
 export class Like extends BaseEntity {
-  @ManyToOne(() => Card, (card) => card.likes)
+  @ManyToOne(() => Card, (card) => card.likes, {
+    onDelete: 'CASCADE',
+  })
+  // @JoinColumn({ name: 'cardId' })
   card: Card;
 
   @ManyToOne(() => User, (user) => user.likes)
