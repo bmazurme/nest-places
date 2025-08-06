@@ -3,6 +3,7 @@ import { Response } from 'express';
 import { join } from 'path';
 import { existsSync, mkdirSync, unlink } from 'fs';
 import * as sharp from 'sharp';
+import { v4 as uuidv4 } from 'uuid';
 
 import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
@@ -83,8 +84,21 @@ export class FilesService {
 
   async updateAvatar(file: Express.Multer.File, user: User) {
     const current = await this.usersService.findOne(user.id);
+    const uniqName = `user_${user.id}_${uuidv4()}.webp`.toLowerCase();
     const targetPath = join(__dirname, '..', '..', 'uploads', 'avatars');
-    const avatarName = join(targetPath, current.avatar);
+    const avatarName = join(targetPath, uniqName);
+
+    // console.log(file.originalname, current.avatar);
+
+    unlink(
+      join(__dirname, '..', '..', 'uploads', 'avatars', current.avatar),
+      (err) => {
+        if (err) {
+          // next(err);
+          console.log(err);
+        }
+      },
+    );
 
     await sharp(file.buffer)
       .resize({
@@ -93,6 +107,9 @@ export class FilesService {
       })
       .toFormat('webp')
       .toFile(avatarName);
+
+    current.avatar = uniqName;
+    await this.usersService.updateAvatar(current);
 
     return current;
   }
