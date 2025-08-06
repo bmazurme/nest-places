@@ -76,11 +76,18 @@ export class Card extends BaseEntity {
    * @relationship Many-to-Many with Tag entity
    * @joinTable Uses a join table for the relationship
    */
-  @ManyToMany(() => Tag, (tag) => tag.cards)
+  @ManyToMany(() => Tag, (tag) => tag.cards, {
+    // nullable: false,
+    onDelete: 'CASCADE',
+  })
   @JoinTable({
     name: 'cardTags',
     joinColumn: { name: 'cardId', referencedColumnName: 'id' },
     inverseJoinColumn: { name: 'tagId', referencedColumnName: 'id' },
   })
   tags: Tag[];
+
+  get username(): string {
+    return this.user.name;
+  }
 }
