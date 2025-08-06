@@ -9,6 +9,7 @@ import {
   Req,
   Get,
   Res,
+  Patch,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
@@ -107,5 +108,15 @@ export class FilesController {
     @Res() response: Response,
   ) {
     return this.filesService.getFile(fileName, response);
+  }
+
+  @UseGuards(JwtGuard)
+  @UseInterceptors(FileInterceptor('files'))
+  @Patch('me/avatar')
+  updateAvatar(
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: { user: User },
+  ) {
+    return this.filesService.updateAvatar(file, req.user);
   }
 }
