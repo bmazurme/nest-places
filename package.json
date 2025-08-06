@@ -37,6 +37,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "cookie-parser": "^1.4.7",
+    "multer": "^2.0.2",
     "nest-winston": "^1.9.4",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
@@ -46,7 +47,9 @@
     "pm2": "^5.3.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
+    "sharp": "^0.33.2",
     "typeorm": "^0.3.21",
+    "uuidv4": "^6.2.13",
     "winston": "^3.13.0",
     "winston-daily-rotate-file": "^5.0.0",
     "winston-telegram": "^2.7.0"
