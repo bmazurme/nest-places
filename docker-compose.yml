@@ -16,59 +16,98 @@ services:
     networks:
       - internal-network
       - internet
-  
-  # Redis
-  redis:
-    container_name: places-redis
-    # platform: linux/x86_64
-    image: docker.io/bitnami/redis:7.0
-    command: redis-server --requirepass password
-    ports:
-      - 6379:6379
-    environment:
-      - REDIS_PASSWORD=password
-    networks:
-      - redis-network
 
-  redis-commander:
-    image: rediscommander/redis-commander:latest
+  pgadmin:
+    image: dpage/pgadmin4:4.18
     restart: always
     environment:
-      REDIS_HOSTS: redis
-      REDIS_HOST: redis
-      REDIS_PORT: redis:6379
-      REDIS_PASSWORD: password
-      HTTP_USER: root
-      HTTP_PASSWORD: root
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: secret
+      PGADMIN_LISTEN_PORT: 80
     ports:
-      - 8081:8081
-    networks:
-      - redis-network
-
-  backend:
-    container_name: compose-back-container
-    build:
-      # context: backend
-      dockerfile: Dockerfile
-    image: cr.yandex/${CR_REGISTRY}/places-nest:latest
-    # platform: linux/amd64
+      - "8080:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      - postgres
     networks:
       - internal-network
       - internet
+
+  minio:
+    image: bitnami/minio:latest
+    restart: always
     ports:
-      - 4000:4000
-    restart: unless-stopped
-    env_file:
-      - .env
-    depends_on:
-      - postgres
+      - 9000:9000
+      - 8000:8000
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-very-hard-password}
+      MINIO_DEFAULT_BUCKETS: 'main'
+      MINIO_API_PORT_NUMBER: 9000
+      MINIO_CONSOLE_PORT_NUMBER: 8000
     volumes:
-      - ./uploads:/app/uploads
-      #- ./uploads:/usr/src/app/uploads
+      - minio-data:/bitnami/minio/data
+    networks:
+      - internet
+  
+  # # Redis
+  # redis:
+  #   container_name: places-redis
+  #   # platform: linux/x86_64
+  #   image: docker.io/bitnami/redis:7.0
+  #   command: redis-server --requirepass password
+  #   ports:
+  #     - 6379:6379
+  #   environment:
+  #     - REDIS_PASSWORD=password
+  #   networks:
+  #     - redis-network
+
+  # redis-commander:
+  #   image: rediscommander/redis-commander:latest
+  #   restart: always
+  #   environment:
+  #     REDIS_HOSTS: redis
+  #     REDIS_HOST: redis
+  #     REDIS_PORT: redis:6379
+  #     REDIS_PASSWORD: password
+  #     HTTP_USER: root
+  #     HTTP_PASSWORD: root
+  #   ports:
+  #     - 8081:8081
+  #   networks:
+  #     - redis-network
+
+  # backend:
+  #   container_name: compose-back-container
+  #   build:
+  #     # context: backend
+  #     dockerfile: Dockerfile
+  #   image: cr.yandex/${CR_REGISTRY}/places-nest:latest
+  #   # platform: linux/amd64
+  #   networks:
+  #     - internal-network
+  #     - internet
+  #   ports:
+  #     - 4000:4000
+  #   restart: unless-stopped
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - postgres
+  #   volumes:
+  #     - ./uploads:/app/uploads
+  #     #- ./uploads:/usr/src/app/uploads
+
+# volumes:
+#   redis:
+#   redis-config:
 
 volumes:
-  redis:
-  redis-config:
+  pgadmin-data:
+  minio-data:
+    driver: local
 
 networks:
   internal-network:
