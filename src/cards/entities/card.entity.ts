@@ -64,8 +64,11 @@ export class Card extends BaseEntity {
    * @relationship One-to-Many with Like entity
    * @joinTable Uses a join table for the relationship
    */
-  @OneToMany(() => Like, (like) => like.card)
-  @JoinTable()
+  @OneToMany(() => Like, (like) => like.card, {
+    onDelete: 'CASCADE',
+    cascade: true,
+  })
+  // @JoinTable()
   likes: Like[];
 
   /**
