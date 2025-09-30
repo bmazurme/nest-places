@@ -8,13 +8,14 @@ import { Repository } from 'typeorm';
 
 import { Card } from './entities/card.entity';
 import { User } from '../users/entities/user.entity';
-// import { Tag } from '../tags/entities/tag.entity';
 
 import { LikesService } from '../likes/likes.service';
 import { TagsService } from 'src/tags/tags.service';
 
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
+import { unlink } from 'fs';
+import { join } from 'path';
 
 @Injectable()
 export class CardsService {
@@ -50,8 +51,29 @@ export class CardsService {
     return this.cardRepository.update(+id, updateCardDto);
   }
 
-  remove(id: number) {
-    return this.cardRepository.delete(id);
+  async remove(id: number) {
+    const card = await this.cardRepository.findOneBy({ id });
+    unlink(
+      join(__dirname, '..', '..', 'uploads', 'covers', card.link),
+      (err) => {
+        if (err) {
+          // next(err);
+          console.log(err);
+        }
+      },
+    );
+    unlink(
+      join(__dirname, '..', '..', 'uploads', 'target', card.link),
+      (err) => {
+        if (err) {
+          // next(err);
+          console.log(err);
+        }
+      },
+    );
+
+    await this.cardRepository.delete(id);
+    return { message: 'card was deleted', id };
   }
 
   async getCount(id: number) {
@@ -69,8 +91,8 @@ export class CardsService {
 
     return this.cardRepository.query(
       `
-        SELECT t.id, t.name, t.link, t."userId" "userid", t.count::int, t."isLiked", u.name userName
-        FROM (SELECT c.id, c.name, c.link, c."userId", COUNT(l."cardId") as count, bool_or(l."userId" = $2) as "isLiked"
+        SELECT t.id, t.name, t.link, t."userId" "userid", t.count::int, t.isliked, u.name userName
+        FROM (SELECT c.id, c.name, c.link, c."userId", COUNT(l."cardId") as count, bool_or(l."userId" = $2) as isliked
             FROM card c
             LEFT JOIN "like" l ON c.id = l."cardId"
             WHERE c."userId" = $1
@@ -138,8 +160,8 @@ export class CardsService {
 
     const [card] = await this.cardRepository.query(
       `
-        SELECT t.id, t.name, t.link, t."userId" userId, t.count::int, t."isLiked", u.name "userName"
-        FROM (SELECT c.id, c.name, c.link, c."userId", COUNT(l."cardId") as count, bool_or(l."userId" = $2) as "isLiked"
+        SELECT t.id, t.name, t.link, t."userId" userId, t.count::int, t.isLiked, u.name "username"
+        FROM (SELECT c.id, c.name, c.link, c."userId", COUNT(l."cardId") as count, bool_or(l."userId" = $2) as isLiked
             FROM card c
             LEFT JOIN "like" l ON c.id = l."cardId"
             WHERE c.id = $1
@@ -161,7 +183,7 @@ export class CardsService {
 
     const [card] = await this.cardRepository.query(
       `
-        SELECT t.id, t.name, t.link, t."userId" userId, t.count::int, t.isLiked, u.name userName
+        SELECT t.id, t.name, t.link, t."userId" userId, t.count::int, t.isLiked, u.name username
         FROM (SELECT c.id, c.name, c.link, c."userId", COUNT(l."cardId") as count, bool_or(l."userId" = $2) as isLiked
             FROM card c
             LEFT JOIN "like" l ON c.id = l."cardId"
