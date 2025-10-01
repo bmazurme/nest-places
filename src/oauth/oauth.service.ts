@@ -3,10 +3,11 @@ import { JwtService } from '@nestjs/jwt';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { Response } from 'express';
 
-// import { HashService } from '../hash/hash.service';
 import { UsersService } from '../users/users.service';
 
 import { User } from '../users/entities/user.entity';
+
+const TARGET_URL = 'http://localhost:3005';
 
 @Injectable()
 export class OAuthService {
@@ -14,7 +15,6 @@ export class OAuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
-    // private readonly hashService: HashService,
   ) {}
 
   async signinOrSignup({ email }: User, response: Response) {
@@ -45,8 +45,9 @@ export class OAuthService {
       maxAge: 3600000,
     });
 
-    response.send({
-      access_token: this.jwtService.sign(payload),
-    });
+    // response.send({
+    //   access_token: this.jwtService.sign(payload),
+    // });
+    response.redirect(TARGET_URL);
   }
 }
