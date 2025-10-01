@@ -13,7 +13,7 @@ import { Response } from 'express';
 
 import { OAuthService } from './oauth.service';
 
-import { User } from 'src/users/entities/user.entity';
+import { User } from '../users/entities/user.entity';
 
 @Controller('oauth')
 @UseInterceptors(ClassSerializerInterceptor)
