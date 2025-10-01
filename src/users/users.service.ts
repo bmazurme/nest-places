@@ -6,11 +6,14 @@ import {
 
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Response } from 'express';
 
 import { User } from './entities/user.entity';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+
+// const TARGET_URL = 'http://localhost:3005';
 
 @Injectable()
 export class UsersService {
@@ -28,6 +31,16 @@ export class UsersService {
     }
 
     return await this.userRepository.save(createUserDto);
+  }
+
+  async logout(response: Response) {
+    response.clearCookie('access_token', {
+      httpOnly: true,
+      secure: true,
+      // secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 0, // Срок действия истек
+    });
   }
 
   async findAll() {
@@ -78,24 +91,16 @@ export class UsersService {
   }
 
   async update(updateUserDto: UpdateUserDto) {
-    return this.userRepository.update(updateUserDto.id, {
+    await this.userRepository.update(updateUserDto.id, {
       name: updateUserDto.name,
       about: updateUserDto.about,
     });
-    // const user = await this.userRepository.findOne({
-    //   where: { id },
-    //   relations: ['roles'],
-    // });
 
-    // if (user?.roles) {
-    //   const role = new Role();
-    //   role.id = updateUserDto.role.id;
-    //   role.name = updateUserDto.role.name;
+    const user = await this.userRepository.findOne({
+      where: { id: updateUserDto.id },
+    });
 
-    //   await user.updateRoles([role], this.userRepository.manager);
-    // }
-
-    // return user;
+    return user;
   }
 
   async updateAvatar(updateUserDto: { id: number; avatar: string }) {
