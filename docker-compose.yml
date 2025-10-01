@@ -35,7 +35,7 @@ services:
       - internet
 
   minio:
-    image: bitnami/minio:latest
+    image: bitnami/minio:2024.11.7
     restart: always
     ports:
       - 9000:9000
