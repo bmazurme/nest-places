@@ -10,8 +10,10 @@ import {
   UseInterceptors,
   ClassSerializerInterceptor,
   UseGuards,
+  Res,
 } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
+import { Response } from 'express';
 
 import { UsersService } from './users.service';
 
@@ -37,6 +39,11 @@ export class UsersController {
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
+  }
+
+  @Post('/logout')
+  logout(@Res({ passthrough: true }) response: Response) {
+    return this.usersService.logout(response);
   }
 
   /**
