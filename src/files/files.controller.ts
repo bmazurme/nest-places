@@ -95,19 +95,25 @@ export class FilesController {
   }
 
   @Get('covers/:coverName')
-  async getCoverFile(
+  getCoverFile(
     @Param('coverName') coverName: string,
     @Res() response: Response,
   ) {
-    return this.filesService.getCoverFile(coverName, response);
+    // return this.filesService.getCoverFile(coverName, response);
+    return this.filesService.getFile(coverName, response);
   }
 
-  @Get(':fileName')
-  async getFile(
-    @Param('fileName') fileName: string,
-    @Res() response: Response,
-  ) {
-    return this.filesService.getFile(fileName, response);
+  // @Get(':fileName')
+  // async getFile(
+  //   @Param('fileName') fileName: string,
+  //   @Res() response: Response,
+  // ) {
+  //   return this.filesService.getFile(fileName, response);
+  // }
+
+  @Get(':name')
+  getFile(@Param('name') name: string, @Res() response: Response) {
+    return this.filesService.getFile(name, response);
   }
 
   @UseGuards(JwtGuard)
