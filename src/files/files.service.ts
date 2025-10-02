@@ -4,6 +4,12 @@ import { join } from 'path';
 import { existsSync, mkdirSync, unlink } from 'fs';
 import * as sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
+// import { ensureDir, writeFile } from 'fs-extra';
+
+import { randomUUID } from 'crypto';
+import * as Minio from 'minio';
+
+import { InjectMinio } from '../minio/minio.decorator';
 
 import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
@@ -12,36 +18,61 @@ import { UsersService } from '../users/users.service';
 export class FilesService {
   // private readonly coversPath = 'covers';
   // private readonly slidesPath = 'slides';
+  protected _bucketName = 'main';
 
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    @InjectMinio() private readonly minioService: Minio.Client,
+  ) {}
 
   async uploadFile(file: Express.Multer.File) {
-    const targetPath = join(__dirname, '..', '..', 'uploads', 'target');
-    const coverPath = join(__dirname, '..', '..', 'uploads', 'covers');
+    // const bucket = join(__dirname, '..', '..', 'uploads', 'bucket');
+    // const fileName = `${Date.now()}-${file.originalname}`;
+    // await writeFile(`${bucket}/${fileName}`, file.buffer);
+    // const targetPath = join(__dirname, '..', '..', 'uploads', 'target');
+    // const coverPath = join(__dirname, '..', '..', 'uploads', 'covers');
 
-    const fileName = `${Date.now()}-${file.originalname.replace(file.originalname.split('.')[file.originalname.split('.').length - 1], 'webp')}`;
-    const fileSourcePath = join(targetPath, fileName);
-    const fileCoverPath = join(coverPath, fileName);
+    // const fileName = `${Date.now()}-${file.originalname.replace(file.originalname.split('.')[file.originalname.split('.').length - 1], 'webp')}`;
+    // const fileSourcePath = join(targetPath, fileName);
+    // const fileCoverPath = join(coverPath, fileName);
 
-    if (!existsSync(targetPath)) {
-      mkdirSync(targetPath);
-    }
+    // if (!existsSync(targetPath)) {
+    //   mkdirSync(targetPath);
+    // }
 
-    if (!existsSync(coverPath)) {
-      mkdirSync(coverPath);
-    }
+    // if (!existsSync(coverPath)) {
+    //   mkdirSync(coverPath);
+    // }
 
-    await sharp(file.buffer)
-      .toFormat('webp')
-      .resize(564, 564)
-      .toFile(fileCoverPath);
+    // await sharp(file.buffer)
+    //   .toFormat('webp')
+    //   .resize(564, 564)
+    //   .toFile(fileCoverPath);
 
-    await sharp(file.buffer)
-      .toFormat('webp')
-      .resize(1000, 1000)
-      .toFile(fileSourcePath);
+    // await sharp(file.buffer)
+    //   .toFormat('webp')
+    //   .resize(1000, 1000)
+    //   .toFile(fileSourcePath);
 
-    return { message: 'File uploaded successfully', link: fileName };
+    return new Promise((resolve, reject) => {
+      const filename = `${randomUUID().toString()}-${file.originalname}`;
+      this.minioService.putObject(
+        this._bucketName,
+        filename,
+        file.buffer,
+        file.size,
+        (error, objInfo) => {
+          if (error) {
+            reject(error);
+          } else {
+            console.log(objInfo);
+            resolve({ ...objInfo, filename });
+          }
+        },
+      );
+    });
+
+    // return { message: 'File uploaded successfully', link: fileName };
   }
 
   removeFile(name: string, user: User) {
@@ -76,10 +107,22 @@ export class FilesService {
       .sendFile(join(__dirname, '..', '..', 'uploads', 'covers', fileName));
   }
 
-  async getFile(fileName: string, response: Response) {
-    response
-      .set('Cache-Control', 'public, max-age=31557600')
-      .sendFile(join(__dirname, '..', '..', 'uploads', 'target', fileName));
+  // async getFile(fileName: string, response: Response) {
+  //   response
+  //     .set('Cache-Control', 'public, max-age=31557600')
+  //     .sendFile(join(__dirname, '..', '..', 'uploads', 'target', fileName));
+  // }
+  async getFile(filename: string, response: Response) {
+    const fileStream = await this.minioService.getObject(
+      this._bucketName,
+      filename,
+    );
+
+    response.set({
+      'Content-Type': 'image/jpeg', // или другой тип вашего изображения
+    });
+
+    fileStream.pipe(response);
   }
 
   async updateAvatar(file: Express.Multer.File, user: User) {
