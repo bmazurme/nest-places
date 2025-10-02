@@ -13,6 +13,7 @@ import { CardsModule } from './cards/cards.module';
 import { LikesModule } from './likes/likes.module';
 import { RolesModule } from './roles/roles.module';
 import { FilesModule } from './files/files.module';
+import { MinioModule } from './minio/minio.module';
 
 import { TypeOrmModuleConfig } from './common/configs';
 
@@ -31,6 +32,7 @@ import { TypeOrmModuleConfig } from './common/configs';
     LikesModule,
     RolesModule,
     FilesModule,
+    MinioModule,
   ],
   controllers: [AppController],
   providers: [AppService],
