@@ -134,8 +134,8 @@ export class CardsController {
   })
   @UseGuards(JwtGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.cardsService.remove(+id);
+  remove(@Param('id') id: string, @Req() req: { user: User }) {
+    return this.cardsService.remove(+id, req.user);
   }
 
   @UseGuards(JwtGuard)
