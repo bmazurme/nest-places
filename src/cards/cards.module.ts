@@ -9,12 +9,14 @@ import { CardsController } from './cards.controller';
 import { Card } from './entities/card.entity';
 import { LikesModule } from '../likes/likes.module';
 import { TagsModule } from '../tags/tags.module';
+import { FilesModule } from '../files/files.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Card]),
     LikesModule,
     TagsModule,
+    FilesModule,
     JwtModule.registerAsync({
       imports: [ConfigModule.forRoot()],
       useFactory: async (configService: ConfigService) => ({
