@@ -48,7 +48,5 @@ export class LikesService {
     }
 
     return await this.likeRepository.delete(like.id);
-
-    // return 'success';
   }
 }
