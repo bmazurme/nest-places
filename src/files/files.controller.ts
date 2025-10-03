@@ -99,21 +99,19 @@ export class FilesController {
     @Param('coverName') coverName: string,
     @Res() response: Response,
   ) {
-    // return this.filesService.getCoverFile(coverName, response);
-    return this.filesService.getFile(coverName, response);
+    return this.filesService.getCover(coverName, response);
   }
 
-  // @Get(':fileName')
-  // async getFile(
-  //   @Param('fileName') fileName: string,
-  //   @Res() response: Response,
-  // ) {
-  //   return this.filesService.getFile(fileName, response);
-  // }
+  @Get('copy/:coverName')
+  async copyCoverFile(@Param('coverName') coverName: string) {
+    await this.filesService.resizeAndCopyImage(coverName);
+
+    return 'ok';
+  }
 
   @Get(':name')
   getFile(@Param('name') name: string, @Res() response: Response) {
-    return this.filesService.getFile(name, response);
+    return this.filesService.getSlide(name, response);
   }
 
   @UseGuards(JwtGuard)
