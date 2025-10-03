@@ -54,8 +54,8 @@ export class FilesController {
   @ApiResponse({ status: 200, description: 'File deleted successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'File not found' })
-  remove(@Param('name') name: string, @Req() req: { user: User }) {
-    return this.filesService.removeFile(name, req.user);
+  remove(@Param('name') name: string) {
+    return this.filesService.removeFile(name);
   }
 
   /**
