@@ -1,24 +1,34 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Response } from 'express';
-import { join } from 'path';
-import { existsSync, mkdirSync, unlink } from 'fs';
-import * as sharp from 'sharp';
-import { v4 as uuidv4 } from 'uuid';
-// import { ensureDir, writeFile } from 'fs-extra';
-
 import { randomUUID } from 'crypto';
 import * as Minio from 'minio';
+import * as sharp from 'sharp';
+import { Readable } from 'stream';
 
 import { InjectMinio } from '../minio/minio.decorator';
-
 import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
 
+async function streamToBuffer(stream: Readable): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    stream.on('data', (chunk) => chunks.push(chunk));
+    stream.on('end', () => resolve(Buffer.concat(chunks)));
+    stream.on('error', reject);
+  });
+}
+
 @Injectable()
 export class FilesService {
-  // private readonly coversPath = 'covers';
-  // private readonly slidesPath = 'slides';
   protected _bucketName = 'main';
+  protected _bucketTmp = 'tmp';
+  protected _bucketCovers = 'covers';
+  protected _bucketSlides = 'slides';
+  protected _bucketAvatars = 'slides';
 
   constructor(
     private readonly usersService: UsersService,
@@ -26,38 +36,11 @@ export class FilesService {
   ) {}
 
   async uploadFile(file: Express.Multer.File) {
-    // const bucket = join(__dirname, '..', '..', 'uploads', 'bucket');
-    // const fileName = `${Date.now()}-${file.originalname}`;
-    // await writeFile(`${bucket}/${fileName}`, file.buffer);
-    // const targetPath = join(__dirname, '..', '..', 'uploads', 'target');
-    // const coverPath = join(__dirname, '..', '..', 'uploads', 'covers');
-
-    // const fileName = `${Date.now()}-${file.originalname.replace(file.originalname.split('.')[file.originalname.split('.').length - 1], 'webp')}`;
-    // const fileSourcePath = join(targetPath, fileName);
-    // const fileCoverPath = join(coverPath, fileName);
-
-    // if (!existsSync(targetPath)) {
-    //   mkdirSync(targetPath);
-    // }
-
-    // if (!existsSync(coverPath)) {
-    //   mkdirSync(coverPath);
-    // }
-
-    // await sharp(file.buffer)
-    //   .toFormat('webp')
-    //   .resize(564, 564)
-    //   .toFile(fileCoverPath);
-
-    // await sharp(file.buffer)
-    //   .toFormat('webp')
-    //   .resize(1000, 1000)
-    //   .toFile(fileSourcePath);
-
     return new Promise((resolve, reject) => {
       const filename = `${randomUUID().toString()}-${file.originalname}`;
+
       this.minioService.putObject(
-        this._bucketName,
+        this._bucketTmp,
         filename,
         file.buffer,
         file.size,
@@ -65,57 +48,68 @@ export class FilesService {
           if (error) {
             reject(error);
           } else {
-            console.log(objInfo);
             resolve({ ...objInfo, filename });
           }
         },
       );
     });
+  }
 
-    // return { message: 'File uploaded successfully', link: fileName };
+  async resizeAndCopyImage(filename: string) {
+    try {
+      const fileStream = await this.minioService.getObject(
+        this._bucketTmp,
+        filename,
+      );
+
+      const buffer = await streamToBuffer(fileStream);
+
+      const cover = await sharp(buffer)
+        .toFormat('webp')
+        .resize(564, 564)
+        .toBuffer();
+
+      const slide = await sharp(buffer)
+        .toFormat('webp')
+        .resize(1000, 1000)
+        .toBuffer();
+
+      await this.minioService.putObject(this._bucketCovers, filename, cover);
+      await this.minioService.putObject(this._bucketSlides, filename, slide);
+
+      return { filename };
+    } catch (error) {
+      console.error('Ошибка при обработке изображения:', error);
+      throw new InternalServerErrorException(
+        'Произошла ошибка при обработке изображения',
+      );
+    }
   }
 
   removeFile(name: string, user: User) {
-    const folder = user.id.toString();
-    const folderCovers = join(__dirname, '..', '..', 'uploads', folder, name);
+    // const folder = user.id.toString();
+    // const folderCovers = join(__dirname, '..', '..', 'uploads', folder, name);
 
-    unlink(folderCovers, (err) => {
-      if (err) {
-        console.error(`Error removing file: ${err}`);
-        return;
-      }
-    });
+    // unlink(folderCovers, (err) => {
+    //   if (err) {
+    //     console.error(`Error removing file: ${err}`);
+    //     return;
+    //   }
+    // });
 
     return `This action removes a #${name} file`;
   }
 
   async getAvatarFile(fileName: string, response: Response) {
-    // const user = await this.usersService.findByAvatar(fileName);
+    const user = await this.usersService.findByAvatar(fileName);
 
-    // if (!user) {
-    //   return new NotFoundException();
-    // }
+    if (!user) {
+      return new NotFoundException();
+    }
 
-    response
-      .set('Cache-Control', 'public, max-age=31557600')
-      .sendFile(join(__dirname, '..', '..', 'uploads', 'avatars', fileName));
-  }
-
-  async getCoverFile(fileName: string, response: Response) {
-    response
-      .set('Cache-Control', 'public, max-age=31557600')
-      .sendFile(join(__dirname, '..', '..', 'uploads', 'covers', fileName));
-  }
-
-  // async getFile(fileName: string, response: Response) {
-  //   response
-  //     .set('Cache-Control', 'public, max-age=31557600')
-  //     .sendFile(join(__dirname, '..', '..', 'uploads', 'target', fileName));
-  // }
-  async getFile(filename: string, response: Response) {
     const fileStream = await this.minioService.getObject(
-      this._bucketName,
-      filename,
+      this._bucketAvatars,
+      fileName,
     );
 
     response.set({
@@ -125,53 +119,45 @@ export class FilesService {
     fileStream.pipe(response);
   }
 
-  async updateAvatar(file: Express.Multer.File, user: User) {
-    const current = await this.usersService.findOne(user.id);
-    const uniqName = `user_${user.id}_${uuidv4()}.webp`.toLowerCase();
-    const targetPath = join(__dirname, '..', '..', 'uploads', 'avatars');
-    const avatarName = join(targetPath, uniqName);
-
-    unlink(
-      join(__dirname, '..', '..', 'uploads', 'avatars', current.avatar),
-      (err) => {
-        if (err) {
-          // next(err);
-          console.log(err);
-        }
-      },
+  async getSlide(filename: string, response: Response) {
+    const fileStream = await this.minioService.getObject(
+      this._bucketSlides,
+      filename,
     );
 
-    await sharp(file.buffer)
-      .resize({
-        width: 240,
-        height: 240,
-      })
-      .toFormat('webp')
-      .toFile(avatarName);
+    response.set({
+      'Content-Type': 'image/jpeg', // или другой тип вашего изображения
+    });
 
-    current.avatar = uniqName;
+    fileStream.pipe(response);
+  }
+  async getCover(filename: string, response: Response) {
+    const fileStream = await this.minioService.getObject(
+      this._bucketCovers,
+      filename,
+    );
+
+    response.set({
+      'Content-Type': 'image/jpeg',
+    });
+
+    fileStream.pipe(response);
+  }
+
+  async updateAvatar(file: Express.Multer.File, user: User) {
+    const current = await this.usersService.findOne(user.id);
+    const filename = `${randomUUID().toString()}-${file.originalname}`;
+    current.avatar = filename;
+    const buffer = file.buffer;
+
+    const avatar = await sharp(buffer)
+      .toFormat('webp')
+      .resize(240, 240)
+      .toBuffer();
+
+    await this.minioService.putObject(this._bucketAvatars, filename, avatar);
     await this.usersService.updateAvatar(current);
 
     return current;
   }
-
-  //   export const getCoverFile = async (req: Request, res: Response, next: NextFunction) => {
-  //   try {
-  //     const card = await Card.findOne({ where: { link: req.params.filename } });
-
-  //     if (!card) {
-  //       return next(new NotFoundError('File not found'));
-  //     }
-
-  //     res
-  //       .setHeader('Cache-Control', 'public, max-age=86400')
-  //       .sendFile(path.join(__dirname, '..', '..', 'uploads', 'covers', card.link));
-  //   } catch (error: unknown) {
-  //     if ((error as Error).name === 'CastError') {
-  //       return next(new BadRequestError('bad request'));
-  //     }
-
-  //     next(error);
-  //   }
-  // };
 }
