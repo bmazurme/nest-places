@@ -10,7 +10,8 @@ import { Card } from './entities/card.entity';
 import { User } from '../users/entities/user.entity';
 
 import { LikesService } from '../likes/likes.service';
-import { TagsService } from 'src/tags/tags.service';
+import { TagsService } from '../tags/tags.service';
+import { FilesService } from '../files/files.service';
 
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
@@ -24,6 +25,7 @@ export class CardsService {
     private readonly cardRepository: Repository<Card>,
     private readonly likesService: LikesService,
     private readonly tagsService: TagsService,
+    private readonly filesService: FilesService,
   ) {}
 
   async create(createCardDto: CreateCardDto, user: User) {
@@ -37,6 +39,8 @@ export class CardsService {
     card.link = createCardDto.link;
     card.user = user;
     card.tags = [tag];
+
+    await this.filesService.resizeAndCopyImage(createCardDto.link);
 
     return this.cardRepository.save(card);
   }
