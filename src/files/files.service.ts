@@ -86,16 +86,9 @@ export class FilesService {
     }
   }
 
-  removeFile(name: string, user: User) {
-    // const folder = user.id.toString();
-    // const folderCovers = join(__dirname, '..', '..', 'uploads', folder, name);
-
-    // unlink(folderCovers, (err) => {
-    //   if (err) {
-    //     console.error(`Error removing file: ${err}`);
-    //     return;
-    //   }
-    // });
+  async removeFile(name: string) {
+    await this.minioService.removeObject(this._bucketCovers, name);
+    await this.minioService.removeObject(this._bucketSlides, name);
 
     return `This action removes a #${name} file`;
   }
