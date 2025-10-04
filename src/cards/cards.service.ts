@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   // NotFoundException,
 } from '@nestjs/common';
@@ -15,8 +16,6 @@ import { FilesService } from '../files/files.service';
 
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
-import { unlink } from 'fs';
-import { join } from 'path';
 
 @Injectable()
 export class CardsService {
@@ -55,28 +54,19 @@ export class CardsService {
     return this.cardRepository.update(+id, updateCardDto);
   }
 
-  async remove(id: number) {
-    const card = await this.cardRepository.findOneBy({ id });
-    unlink(
-      join(__dirname, '..', '..', 'uploads', 'covers', card.link),
-      (err) => {
-        if (err) {
-          // next(err);
-          console.log(err);
-        }
-      },
-    );
-    unlink(
-      join(__dirname, '..', '..', 'uploads', 'target', card.link),
-      (err) => {
-        if (err) {
-          // next(err);
-          console.log(err);
-        }
-      },
-    );
+  async remove(id: number, user: User) {
+    const card = await this.cardRepository.findOne({
+      where: { id },
+      relations: ['user'],
+    });
 
+    if (card.user.id !== user.id) {
+      return new ForbiddenException();
+    }
+
+    await this.filesService.removeFile(card.link);
     await this.cardRepository.delete(id);
+
     return { message: 'card was deleted', id };
   }
 
