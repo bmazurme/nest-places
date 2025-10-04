@@ -118,8 +118,11 @@ export class FilesController {
   @UseInterceptors(FileInterceptor('files'))
   @Patch('me/avatar')
   updateAvatar(
-    @UploadedFile() file: Express.Multer.File,
-    @Req() req: { user: User },
+    @UploadedFile()
+    file: Express.Multer.File,
+
+    @Req()
+    req: { user: User },
   ) {
     return this.filesService.updateAvatar(file, req.user);
   }
