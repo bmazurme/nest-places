@@ -60,7 +60,7 @@
     "winston-telegram": "^2.7.0"
   },
   "devDependencies": {
-    "@compodoc/compodoc": "^1.1.30",
+    "@compodoc/compodoc": "^1.1.31",
     "@nestjs/cli": "^11.0.10",
     "@nestjs/schematics": "^11.0.8",
     "@nestjs/testing": "^11.1.6",
@@ -75,7 +75,7 @@
     "@types/supertest": "^6.0.3",
     "@typescript-eslint/eslint-plugin": "^8.45.0",
     "@typescript-eslint/parser": "^8.45.0",
-    "eslint": "^9.36.0",
+    "eslint": "^9.37.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "jest": "^30.2.0",
