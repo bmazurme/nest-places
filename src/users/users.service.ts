@@ -6,7 +6,6 @@ import {
 
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Response } from 'express';
 
 import { User } from './entities/user.entity';
 
@@ -29,16 +28,6 @@ export class UsersService {
     }
 
     return await this.userRepository.save(createUserDto);
-  }
-
-  async logout(response: Response) {
-    response.clearCookie('access_token', {
-      httpOnly: true,
-      secure: true,
-      // secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 0, // Срок действия истек
-    });
   }
 
   async findAll() {
