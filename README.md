@@ -78,3 +78,17 @@ Nest is [MIT licensed](LICENSE).
   
   $ ncu -t minor --upgrade
 ```
+
+### Tech Stack
+![Nodejs](https://img.shields.io/badge/-Nodejs-black?style=flat-square&logo=Node.js)
+![Express](https://img.shields.io/badge/-Express-black?style=flat-square&logo=express)
+![Nest](https://img.shields.io/badge/-Nest-black?style=flat-square&logo=nestjs)
+![Sharp](https://img.shields.io/badge/-Sharp-black?style=flat-square&logo=sharp)
+![TypeORM](https://img.shields.io/badge/-TypeORM-black?style=flat-square&logo=typeorm)
+![PostgreSQL](https://img.shields.io/badge/-PostgreSQL-black?style=flat-square&logo=postgresql)
+![TypeScript](https://img.shields.io/badge/-TypeScript-black?style=flat-square&logo=typescript)
+![Eslint](https://img.shields.io/badge/-Eslint-black?style=flat-square&logo=eslint)
+![PM2](https://img.shields.io/badge/-PM2-black?style=flat-square&logo=pm2)
+![Minio](https://img.shields.io/badge/-Minio-black?style=flat-square&logo=minio)
+![Docker](https://img.shields.io/badge/-Docker-black?style=flat-square&logo=docker)
+
