@@ -1,19 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { Response } from 'express';
 
 import { UsersService } from '../users/users.service';
+import { AuthService } from '../auth/auth.service';
 
 import { User } from '../users/entities/user.entity';
 
-const TARGET_URL = 'http://localhost:3005';
 
 @Injectable()
 export class OAuthService {
   constructor(
     private readonly usersService: UsersService,
-    private readonly jwtService: JwtService,
+    private readonly authService: AuthService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
@@ -30,24 +29,6 @@ export class OAuthService {
       await this.cacheManager.set(email, currentUser);
     }
 
-    const payload = {
-      sub: currentUser.id,
-      roles: (currentUser as User & { roles: string[] }).roles.map(
-        ({ name }) => name,
-      ),
-    };
-
-    // return {
-    //   access_token: this.jwtService.sign(payload),
-    // };
-    response.cookie('access_token', this.jwtService.sign(payload), {
-      httpOnly: true,
-      maxAge: 3600000,
-    });
-
-    // response.send({
-    //   access_token: this.jwtService.sign(payload),
-    // });
-    response.redirect(TARGET_URL);
+    this.authService.signin(currentUser, response);
   }
 }
