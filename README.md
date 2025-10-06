@@ -80,7 +80,7 @@ Nest is [MIT licensed](LICENSE).
 ```
 
 ### Tech Stack
-![Node](https://img.shields.io/badge/-Node-black?style=flat-square&logo=node)
+![Nodejs](https://img.shields.io/badge/-Nodejs-black?style=flat-square&logo=Node.js)
 ![Express](https://img.shields.io/badge/-Express-black?style=flat-square&logo=express)
 ![Nest](https://img.shields.io/badge/-Nest-black?style=flat-square&logo=nestjs)
 ![Sharp](https://img.shields.io/badge/-Sharp-black?style=flat-square&logo=sharp)
