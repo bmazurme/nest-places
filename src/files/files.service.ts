@@ -93,64 +93,166 @@ export class FilesService {
     return `This action removes a #${name} file`;
   }
 
-  async getAvatarFile(fileName: string, response: Response) {
-    const user = await this.usersService.findByAvatar(fileName);
+  async getAvatarFile(filename: string, response: Response) {
+    try {
+      // Проверяем существование аватара в базе данных
+      const user = await this.usersService.findByAvatar(filename);
 
-    if (!user) {
-      return new NotFoundException();
+      if (!user) {
+        return new NotFoundException();
+      }
+
+      // Получаем поток файла из Minio хранилища
+      const fileStream = await this.minioService.getObject(
+        this._bucketAvatars,
+        filename,
+      );
+
+      // Устанавливаем необходимые заголовки ответа
+      response.set({
+        'Content-Type': 'image/jpeg', // Можно добавить проверку типа файла
+        'Content-Disposition': `inline; filename="${filename}"`,
+        'Cache-Control': 'public, max-age=31536000', // Кэширование на год
+      });
+
+      // Передаем поток файла в ответ
+      fileStream
+        .pipe(response)
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        .on('error', (error) => {
+          // Обработка ошибок при передаче потока
+          response.status(500).send('Ошибка при получении аватара');
+        })
+        .on('finish', () => {
+          // Логирование успешного завершения
+          // logger.info(`Аватар ${fileName} успешно отправлен`);
+        });
+    } catch (error) {
+      // Обработка ошибок
+      switch (error.name) {
+        case 'NotFoundException':
+          return response.status(404).send('Аватар не найден');
+        case 'NoSuchKey':
+          return response.status(404).send('Файл аватара не существует');
+        default:
+          return response.status(500).send('Внутренняя ошибка сервера');
+      }
     }
-
-    const fileStream = await this.minioService.getObject(
-      this._bucketAvatars,
-      fileName,
-    );
-
-    response.set({
-      'Content-Type': 'image/jpeg', // или другой тип вашего изображения
-    });
-
-    fileStream.pipe(response);
   }
 
   async getSlide(filename: string, response: Response) {
-    const fileStream = await this.minioService.getObject(
-      this._bucketSlides,
-      filename,
-    );
+    try {
+      const fileStream = await this.minioService.getObject(
+        this._bucketSlides,
+        filename,
+      );
 
-    response.set({
-      'Content-Type': 'image/jpeg', // или другой тип вашего изображения
-    });
+      // Устанавливаем необходимые заголовки ответа
+      response.set({
+        'Content-Type': 'image/jpeg', // Можно добавить проверку типа файла
+        'Content-Disposition': `inline; filename="${filename}"`,
+        'Cache-Control': 'public, max-age=31536000', // Кэширование на год
+      });
 
-    fileStream.pipe(response);
+      // Передаем поток файла в ответ
+      fileStream
+        .pipe(response)
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        .on('error', (error) => {
+          // Обработка ошибок при передаче потока
+          response.status(500).send('Ошибка при получении файла');
+        })
+        .on('finish', () => {
+          // Логирование успешного завершения
+          // logger.info(`Файл ${filename} успешно отправлен`);
+        });
+    } catch (error) {
+      // Обработка ошибок при получении объекта
+      switch (error.code) {
+        case 'NoSuchKey':
+          return response.status(404).send('Слайд не найден');
+        case 'BucketAlreadyExists':
+          return response.status(500).send('Ошибка конфигурации хранилища');
+        default:
+          return response.status(500).send('Внутренняя ошибка сервера');
+      }
+    }
   }
+
   async getCover(filename: string, response: Response) {
-    const fileStream = await this.minioService.getObject(
-      this._bucketCovers,
-      filename,
-    );
+    try {
+      const fileStream = await this.minioService.getObject(
+        this._bucketCovers,
+        filename,
+      );
 
-    response.set({
-      'Content-Type': 'image/jpeg',
-    });
+      // Устанавливаем необходимые заголовки ответа
+      response.set({
+        'Content-Type': 'image/jpeg', // Можно добавить проверку типа файла
+        'Content-Disposition': `inline; filename="${filename}"`,
+        'Cache-Control': 'public, max-age=31536000', // Кэширование на год
+      });
 
-    fileStream.pipe(response);
+      // Передаем поток файла в ответ
+      fileStream
+        .pipe(response)
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        .on('error', (error) => {
+          // Обработка ошибок при передаче потока
+          response.status(500).send('Ошибка при получении файла');
+        })
+        .on('finish', () => {
+          // Логирование успешного завершения
+          // logger.info(`Файл ${filename} успешно отправлен`);
+        });
+    } catch (error) {
+      // Обработка ошибок при получении объекта
+      switch (error.code) {
+        case 'NoSuchKey':
+          return response.status(404).send('Файл не найден');
+        default:
+          return response.status(500).send('Внутренняя ошибка сервера');
+      }
+    }
   }
 
   async updateAvatar(file: Express.Multer.File, user: User) {
+    // Получаем текущего пользователя из базы данных
     const current = await this.usersService.findOne(user.id);
-    const filename = `${randomUUID().toString()}-${file.originalname}`;
-    current.avatar = filename;
+
+    // Генерируем уникальное имя файла с сохранением оригинального расширения
+    const uniqueFilename = `${randomUUID().toString()}-${file.originalname}`;
+    current.avatar = uniqueFilename;
+
+    // Получаем буфер загруженного файла
     const buffer = file.buffer;
 
-    const avatar = await sharp(buffer)
-      .toFormat('webp')
-      .resize(240, 240)
-      .toBuffer();
+    try {
+      // Обрабатываем изображение:
+      // - конвертируем в формат WebP
+      // - изменяем размер до 240x240 пикселей
+      // - получаем обработанный буфер
+      const avatar = await sharp(buffer)
+        .toFormat('webp')
+        .resize(240, 240)
+        .toBuffer();
 
-    await this.minioService.putObject(this._bucketAvatars, filename, avatar);
-    await this.usersService.updateAvatar(current);
+      // Сохраняем обработанное изображение в Minio
+      await this.minioService.putObject(
+        this._bucketAvatars,
+        uniqueFilename,
+        avatar,
+      );
 
-    return current;
+      // Обновляем информацию об аватаре в базе данных
+      await this.usersService.updateAvatar(current);
+
+      return current;
+    } catch (error) {
+      // Обработка ошибок (можно добавить логирование)
+      throw new InternalServerErrorException(
+        'Ошибка при обработке или сохранении аватара',
+      );
+    }
   }
 }
