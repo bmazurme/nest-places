@@ -2,7 +2,8 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
-  // NotFoundException,
+  InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -28,191 +29,375 @@ export class CardsService {
   ) {}
 
   async create(createCardDto: CreateCardDto, user: User) {
-    const tag = await this.tagsService.findByNameOrCreate(
-      createCardDto.tagName,
-    );
+    if (!createCardDto || !createCardDto.name || !createCardDto.link) {
+      throw new BadRequestException('Invalid card data');
+    }
 
-    const card = new Card();
+    if (!user || !user.id) {
+      throw new BadRequestException('Invalid user object');
+    }
 
-    card.name = createCardDto.name;
-    card.link = createCardDto.link;
-    card.user = user;
-    card.tags = [tag];
+    try {
+      const tag = await this.tagsService.findByNameOrCreate(
+        createCardDto.tagName,
+      );
 
-    await this.filesService.resizeAndCopyImage(createCardDto.link);
+      const card = new Card();
+      card.name = createCardDto.name;
+      card.link = createCardDto.link;
+      card.user = user;
+      card.tags = [tag];
 
-    return this.cardRepository.save(card);
+      try {
+        await this.filesService.resizeAndCopyImage(createCardDto.link);
+      } catch (fileError) {
+        throw new BadRequestException('Failed to process image file');
+      }
+      
+      return this.cardRepository.save(card);
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException('Failed to create card');
+    }
   }
 
   async findAll() {
-    return await this.cardRepository.find({
-      relations: ['tags'],
-    });
+    try {
+      return await this.cardRepository.find({
+        relations: ['tags'],
+        order: {
+          createdAt: 'DESC' // Сортировка по дате создания
+        },
+      });
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+    
+      throw new InternalServerErrorException('Failed to fetch cards');
+    }
   }
 
-  update(id: number, updateCardDto: UpdateCardDto) {
-    return this.cardRepository.update(+id, updateCardDto);
+  async update(id: number, updateCardDto: UpdateCardDto) {
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new BadRequestException('Invalid card ID');
+    }
+
+    if (!updateCardDto) {
+      throw new BadRequestException('Invalid update data');
+    }
+
+    try {
+      const existingCard = await this.cardRepository.findOne({
+        where: { id },
+        relations: ['user'],
+      });
+
+      if (!existingCard) {
+        throw new NotFoundException('Card not found');
+      }
+
+      return this.cardRepository.update(+id, updateCardDto);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException('Failed to update card');
+    }
   }
 
   async remove(id: number, user: User) {
-    const card = await this.cardRepository.findOne({
-      where: { id },
-      relations: ['user'],
-    });
-
-    if (card.user.id !== user.id) {
-      return new ForbiddenException();
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new BadRequestException('Invalid card ID');
     }
 
-    await this.filesService.removeFile(card.link);
-    await this.cardRepository.delete(id);
+    if (!user || !user.id) {
+      throw new BadRequestException('Invalid user object');
+    }
 
-    return { message: 'card was deleted', id };
+    try {
+      const card = await this.cardRepository.findOne({
+        where: { id },
+        relations: ['user'],
+      });
+
+      if (!card) {
+        throw new NotFoundException('Card not found');
+      }
+
+      if (card.user.id !== user.id) {
+        return new ForbiddenException('Access denied');
+      }
+
+      await this.filesService.removeFile(card.link);
+      await this.cardRepository.delete(id);
+
+      return { message: 'Card was successfully deleted', id };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException('Failed to delete card');
+    }
   }
 
   async getCount(id: number) {
-    const count = await this.cardRepository.countBy({
-      user: { id },
-    });
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new BadRequestException('Invalid user ID');
+    }
 
-    return { count };
+    try {
+      const count = await this.cardRepository.countBy({
+        user: { id },
+      });
+
+      return { count };
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException('Failed to get card count');
+    }
   }
 
   async getCardsByUser(userId: number, page: number, user: User) {
-    if (Number.isNaN(userId) || Number.isNaN(page)) {
-      return new BadRequestException();
+    const PAGE_SIZE = 3;
+
+    if (!Number.isInteger(userId) || userId <= 0) {
+      throw new BadRequestException('Invalid user ID');
     }
 
-    return this.cardRepository.query(
-      `
-        SELECT t.id, t.name, t.link, t."userId" "userid", t.count::int, t.isliked, u.name userName
-        FROM (SELECT c.id, c.name, c.link, c."userId", COUNT(l."cardId") as count, bool_or(l."userId" = $2) as isliked
-            FROM card c
-            LEFT JOIN "like" l ON c.id = l."cardId"
-            WHERE c."userId" = $1
-            GROUP BY c.id) t
-        LEFT JOIN "user" u ON t."userId" = "u".id
-        ORDER BY t.id DESC
-        OFFSET $3 ROWS
-        FETCH NEXT 3 ROWS ONLY
-      `,
-      [userId, user.id, (page - 1) * 3],
-    );
+    if (!Number.isInteger(page) || page <= 0) {
+      throw new BadRequestException('Invalid page number');
+    }
+
+    if (!user || !user.id) {
+      throw new BadRequestException('Invalid user object');
+    }
+
+    try {
+      const offset = (page - 1) * PAGE_SIZE;
+
+      return this.cardRepository.query(
+        `
+          SELECT t.id, t.name, t.link, t."userId" "userid", t.count::int, t.isliked, u.name userName
+          FROM (SELECT c.id, c.name, c.link, c."userId", COUNT(l."cardId") as count, bool_or(l."userId" = $2) as isliked
+              FROM card c
+              LEFT JOIN "like" l ON c.id = l."cardId"
+              WHERE c."userId" = $1
+              GROUP BY c.id) t
+          LEFT JOIN "user" u ON t."userId" = "u".id
+          ORDER BY t.id DESC
+          OFFSET $3 ROWS
+          FETCH NEXT 3 ROWS ONLY
+        `,
+        [userId, user.id, offset],
+      );
+    } catch (error) {
+      if (error.code && error.code.startsWith('ER_')) {
+        throw new InternalServerErrorException('Database error');
+      }
+
+      throw error;
+    }
   }
 
   async getCardsByTag(tagName: string, page: number, user: User) {
-    if (Number.isNaN(page)) {
-      return new BadRequestException();
+    const PAGE_SIZE = 3;
+
+    if (!tagName || typeof tagName !== 'string') {
+      throw new BadRequestException('Invalid tag name');
+    }
+    
+    if (!Number.isInteger(page) || page <= 0) {
+      throw new BadRequestException('Invalid page number');
     }
 
-    return this.cardRepository.query(
-      `
-        SELECT rslt.id, rslt.name, rslt.link, rslt."userId" userid, rslt.count::int, rslt.liked isliked, rslt.userName, rslt.tagsname tagsname
-        FROM (SELECT tt.id, tt.name, tt.link, tt."userId", tt.count::int, tt.liked, tt.userName, tt.tagid, tag.name tagsname
-            FROM (SELECT t.id, t.name, t.link, t."userId", t.count::int, t.liked, u.name userName, tg."tagId" tagid
-                FROM (SELECT c.id, c.name, c.link, c."userId", COUNT(l."cardId") as count, bool_or(l."userId" = $2) as liked
-                    FROM card c
-                    LEFT JOIN "like" l ON c.id = l."cardId"
-                    GROUP BY c.id) t
-                LEFT JOIN "user" u ON t."userId" = u.id
-                LEFT JOIN "cardTags" tg ON t.id = tg."cardId") tt
-            LEFT JOIN "tag" ON tt.tagid = tag.id) rslt
-        WHERE tagsname = $1
-        ORDER BY rslt.id DESC
-        OFFSET $3 ROWS
-        FETCH NEXT 3 ROWS ONLY
-      `,
-      [tagName, user.id, (page - 1) * 3],
-    );
+    if (!user || !user.id) {
+      throw new BadRequestException('Invalid user');
+    }
+
+    try {
+      const offset = (page - 1) * PAGE_SIZE;
+
+      return this.cardRepository.query(
+        `
+          SELECT rslt.id, rslt.name, rslt.link, rslt."userId" userid, rslt.count::int, rslt.liked isliked, rslt.userName, rslt.tagsname tagsname
+          FROM (SELECT tt.id, tt.name, tt.link, tt."userId", tt.count::int, tt.liked, tt.userName, tt.tagid, tag.name tagsname
+              FROM (SELECT t.id, t.name, t.link, t."userId", t.count::int, t.liked, u.name userName, tg."tagId" tagid
+                  FROM (SELECT c.id, c.name, c.link, c."userId", COUNT(l."cardId") as count, bool_or(l."userId" = $2) as liked
+                      FROM card c
+                      LEFT JOIN "like" l ON c.id = l."cardId"
+                      GROUP BY c.id) t
+                  LEFT JOIN "user" u ON t."userId" = u.id
+                  LEFT JOIN "cardTags" tg ON t.id = tg."cardId") tt
+              LEFT JOIN "tag" ON tt.tagid = tag.id) rslt
+          WHERE tagsname = $1
+          ORDER BY rslt.id DESC
+          OFFSET $3 ROWS
+          FETCH NEXT 3 ROWS ONLY
+        `,
+        [tagName, user.id, offset],
+      );
+    } catch (error) {
+      if (error.code && error.code.startsWith('ER_')) {
+        throw new InternalServerErrorException('Database error');
+      }
+
+      throw error;
+    }
   }
 
   async getCardsByPage(page: number, currentUser: number) {
-    if (Number.isNaN(page)) {
-      return new BadRequestException();
+    const PAGE_SIZE = 3;
+
+    if (!Number.isInteger(page) || page <= 0) {
+      throw new BadRequestException('Invalid page number');
+    }
+    
+    if (!Number.isInteger(currentUser) || currentUser <= 0) {
+      throw new BadRequestException('Invalid user ID');
     }
 
-    return this.cardRepository.query(
-      `
-        SELECT t.id, t.name, t.link, t."userId" "userId", t.count::int, t.isLiked, u.name userName
-        FROM (SELECT c.id, c.name, c.link, c."userId", COUNT(l."cardId") as count, bool_or(l."userId" = $1) as isLiked
-            FROM card c
-            LEFT JOIN "like" l ON c.id = l."cardId"
-            GROUP BY c.id) t
-        LEFT JOIN "user" u ON t."userId" = "u".id
-        ORDER BY t.id DESC
-        OFFSET $2 ROWS
-        FETCH NEXT 3 ROWS ONLY
-      `,
-      [currentUser, (page - 1) * 3],
-    );
+    try {
+      const offset = (page - 1) * PAGE_SIZE;
+
+      return this.cardRepository.query(
+        `
+          SELECT t.id, t.name, t.link, t."userId" "userId", t.count::int, t.isLiked, u.name userName
+          FROM (SELECT c.id, c.name, c.link, c."userId", COUNT(l."cardId") as count, bool_or(l."userId" = $1) as isLiked
+              FROM card c
+              LEFT JOIN "like" l ON c.id = l."cardId"
+              GROUP BY c.id) t
+          LEFT JOIN "user" u ON t."userId" = "u".id
+          ORDER BY t.id DESC
+          OFFSET $2 ROWS
+          FETCH NEXT 3 ROWS ONLY
+        `,
+        [currentUser, offset],
+      );
+    } catch (error) {
+      if (error.code && error.code.startsWith('ER_')) {
+        throw new InternalServerErrorException('Database error');
+      }
+
+      throw error;
+    }
   }
 
   async getCardById(cardId: number, userId: number) {
-    if (Number.isNaN(cardId)) {
-      return new BadRequestException();
+    if (!Number.isInteger(cardId) || cardId <= 0) {
+      throw new BadRequestException('Invalid card ID');
+    }
+    
+    if (!Number.isInteger(userId) || userId <= 0) {
+      throw new BadRequestException('Invalid user ID');
     }
 
-    const [card] = await this.cardRepository.query(
-      `
-        SELECT t.id, t.name, t.link, t."userId" userId, t.count::int, t.isLiked, u.name "username"
-        FROM (SELECT c.id, c.name, c.link, c."userId", COUNT(l."cardId") as count, bool_or(l."userId" = $2) as isLiked
-            FROM card c
-            LEFT JOIN "like" l ON c.id = l."cardId"
-            WHERE c.id = $1
-            GROUP BY c.id) t
-        LEFT JOIN "user" u ON t."userId" = "u".id
-        ORDER BY t.id DESC
-      `,
-      [cardId, userId],
-    );
-    return card;
+    try {
+      const [card] = await this.cardRepository.query(
+        `
+          SELECT t.id, t.name, t.link, t."userId" userId, t.count::int, t.isLiked, u.name "username"
+          FROM (SELECT c.id, c.name, c.link, c."userId", COUNT(l."cardId") as count, bool_or(l."userId" = $2) as isLiked
+              FROM card c
+              LEFT JOIN "like" l ON c.id = l."cardId"
+              WHERE c.id = $1
+              GROUP BY c.id) t
+          LEFT JOIN "user" u ON t."userId" = "u".id
+          ORDER BY t.id DESC
+        `,
+        [cardId, userId],
+      );
+
+      if (!card) {
+        throw new NotFoundException('Card not found');
+      }
+
+      return card;
+    } catch (error) {
+      if (error.code && error.code.startsWith('ER_')) {
+        throw new InternalServerErrorException('Database error');
+      }
+
+      throw error;
+    }
   }
 
   async likeCard({ id }: { id: number }, user: User) {
-    if (Number.isNaN(id)) {
-      return new BadRequestException();
+    if (!Number.isInteger(id) || id <= 0) {
+      return new BadRequestException('Invalid card ID');
     }
 
-    await this.likesService.like({ user, card: { id } });
+    try {
+      await this.likesService.like({ user, card: { id } });
 
-    const [card] = await this.cardRepository.query(
-      `
-        SELECT t.id, t.name, t.link, t."userId" userId, t.count::int, t.isLiked, u.name username
-        FROM (SELECT c.id, c.name, c.link, c."userId", COUNT(l."cardId") as count, bool_or(l."userId" = $2) as isLiked
-            FROM card c
-            LEFT JOIN "like" l ON c.id = l."cardId"
-            WHERE c.id = $1
-            GROUP BY c.id) t
-        LEFT JOIN "user" u ON t."userId" = u.id
-        ORDER BY t.id DESC
-      `,
-      [id, user.id],
-    );
+      const [card] = await this.cardRepository.query(
+        `
+          SELECT t.id, t.name, t.link, t."userId" userId, t.count::int, t.isLiked, u.name username
+          FROM (SELECT c.id, c.name, c.link, c."userId", COUNT(l."cardId") as count, bool_or(l."userId" = $2) as isLiked
+              FROM card c
+              LEFT JOIN "like" l ON c.id = l."cardId"
+              WHERE c.id = $1
+              GROUP BY c.id) t
+          LEFT JOIN "user" u ON t."userId" = u.id
+          ORDER BY t.id DESC
+        `,
+        [id, user.id],
+      );
 
-    return card;
+      if (!card) {
+        throw new NotFoundException('Card not found');
+      }
+
+      return card;
+    } catch (error) {
+      if (error.code && error.code.startsWith('ER_')) {
+        throw new InternalServerErrorException('Database error');
+      }
+
+      throw error;
+    }
   }
 
   async dislikeCard({ id }: { id: number }, user: User) {
-    if (Number.isNaN(id)) {
-      return new BadRequestException();
+    if (!Number.isInteger(id) || id <= 0) {
+      return new BadRequestException('Invalid card ID');
     }
 
-    await this.likesService.dislike({ user, card: { id } });
+    try {
+      await this.likesService.dislike({ user, card: { id } });
 
-    const [card] = await this.cardRepository.query(
-      `
-        SELECT t.id, t.name, t.link, t."userId" userId, t.count::int, t.isLiked, u.name userName
-        FROM (SELECT c.id, c.name, c.link, c."userId", COUNT(l."cardId") as count, bool_or(l."userId" = $2) as isLiked
-            FROM card c
-            LEFT JOIN "like" l ON c.id = l."cardId"
-            WHERE c.id = $1
-            GROUP BY c.id) t
-        LEFT JOIN "user" u ON t."userId" = u.id
-        ORDER BY t.id DESC
-      `,
-      [id, user.id],
-    );
+      const [card] = await this.cardRepository.query(
+        `
+          SELECT t.id, t.name, t.link, t."userId" userId, t.count::int, t.isLiked, u.name userName
+          FROM (SELECT c.id, c.name, c.link, c."userId", COUNT(l."cardId") as count, bool_or(l."userId" = $2) as isLiked
+              FROM card c
+              LEFT JOIN "like" l ON c.id = l."cardId"
+              WHERE c.id = $1
+              GROUP BY c.id) t
+          LEFT JOIN "user" u ON t."userId" = u.id
+          ORDER BY t.id DESC
+        `,
+        [id, user.id],
+      );
 
-    return card;
+      if (!card) {
+        throw new NotFoundException('Card not found');
+      }
+
+      return card;
+    } catch (error) {
+      if (error.code && error.code.startsWith('ER_')) {
+        throw new InternalServerErrorException('Database error');
+      }
+
+      throw error;
+    }
   }
 }
