@@ -13,7 +13,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async logout(response: Response) {
+  async logout(response: Response, user: User) {
     try {
       response.clearCookie('access_token', {
         httpOnly: true,
@@ -22,9 +22,11 @@ export class AuthService {
         sameSite: 'strict',
         maxAge: 0,
       });
-      this.logger.debug('User successfully logged out');
+
+      this.logger.log(`User ${user.id} successfully logged out`);
     } catch (error) {
       this.logger.error('Failed to logout', error);
+
       throw new HttpException('Failed to logout', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -44,7 +46,8 @@ export class AuthService {
       });
 
       response.redirect(TARGET_URL);
-      this.logger.debug('User successfully signed in');
+
+      this.logger.log(`User ${currentUser.id} successfully signed in`);
     } catch (error) {
       this.logger.error('Failed to sign in', error);
       throw new HttpException('Failed to sign in', HttpStatus.INTERNAL_SERVER_ERROR);
