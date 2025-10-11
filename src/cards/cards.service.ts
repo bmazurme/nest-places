@@ -59,6 +59,8 @@ export class CardsService {
       
       return this.cardRepository.save(card);
     } catch (error) {
+      this.logger.error(`Card create error ${error.message}`);
+
       if (error instanceof BadRequestException) {
         throw error;
       }
@@ -105,6 +107,8 @@ export class CardsService {
 
       return this.cardRepository.update(+id, updateCardDto);
     } catch (error) {
+      this.logger.error(`Card update error ${error.message}`);
+
       if (error instanceof NotFoundException) {
         throw error;
       }
@@ -141,6 +145,8 @@ export class CardsService {
 
       return { message: 'Card was successfully deleted', id };
     } catch (error) {
+      this.logger.error(`Card delete error ${error.message}`);
+
       if (error instanceof NotFoundException) {
         throw error;
       }
@@ -354,6 +360,8 @@ export class CardsService {
 
       return card;
     } catch (error) {
+      this.logger.error(`Like error ${error.message}`);
+
       if (error.code && error.code.startsWith('ER_')) {
         throw new InternalServerErrorException('Database error');
       }
@@ -390,6 +398,8 @@ export class CardsService {
 
       return card;
     } catch (error) {
+      this.logger.error(`Dislike error ${error.message}`);
+
       if (error.code && error.code.startsWith('ER_')) {
         throw new InternalServerErrorException('Database error');
       }
