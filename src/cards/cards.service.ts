@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -20,6 +21,8 @@ import { UpdateCardDto } from './dto/update-card.dto';
 
 @Injectable()
 export class CardsService {
+  private readonly logger = new Logger('CardsService');
+  
   constructor(
     @InjectRepository(Card)
     private readonly cardRepository: Repository<Card>,
@@ -216,6 +219,8 @@ export class CardsService {
     }
     
     if (!Number.isInteger(page) || page <= 0) {
+      this.logger.error(`Invalid page number ${page}`);
+      
       throw new BadRequestException('Invalid page number');
     }
 
@@ -254,16 +259,8 @@ export class CardsService {
     }
   }
 
-  async getCardsByPage(page: number, currentUser: number) {
+  async getCardsByPage(page: number = 0, currentUser: number) {
     const PAGE_SIZE = 3;
-
-    if (!Number.isInteger(page) || page <= 0) {
-      throw new BadRequestException('Invalid page number');
-    }
-    
-    if (!Number.isInteger(currentUser) || currentUser <= 0) {
-      throw new BadRequestException('Invalid user ID');
-    }
 
     try {
       const offset = (page - 1) * PAGE_SIZE;
