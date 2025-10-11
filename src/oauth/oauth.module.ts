@@ -5,7 +5,6 @@ import { CacheModule } from '@nestjs/cache-manager';
 
 import { OAuthService } from './oauth.service';
 import { AuthService } from '../auth/auth.service';
-// import { HashModule } from 'src/hash/hash.module';
 import { OAuthController } from './oauth.controller';
 
 import { UsersModule } from '../users/users.module';
@@ -16,7 +15,6 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 @Module({
   imports: [
     UsersModule,
-    // AuthService,
     CacheModule.register(),
     // HashModule,
     JwtModule.registerAsync({
