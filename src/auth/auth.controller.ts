@@ -7,12 +7,14 @@ import {
   Res,
   HttpCode,
   HttpStatus,
+  Req,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 import { JwtGuard } from '../common/guards/jwt.guard';
 import { AuthService } from './auth.service';
+import { User } from '../users/entities/user.entity';
 
 @UseGuards(JwtGuard)
 @Controller('auth')
@@ -31,7 +33,10 @@ export class AuthController {
     status: 404,
     description: 'User not found',
   })
-  logout(@Res({ passthrough: true }) response: Response) {
-    return this.authService.logout(response);
+  logout(
+    @Res({ passthrough: true }) response: Response,
+    @Req() req: { user: User },
+  ) {
+    return this.authService.logout(response, req.user);
   }
 }
