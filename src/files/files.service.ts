@@ -1,6 +1,8 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { Response } from 'express';
@@ -24,6 +26,8 @@ async function streamToBuffer(stream: Readable): Promise<Buffer> {
 
 @Injectable()
 export class FilesService {
+  private readonly logger = new Logger('UserService');
+
   protected _bucketName = 'main';
   protected _bucketTmp = 'tmp';
   protected _bucketCovers = 'covers';
@@ -87,10 +91,40 @@ export class FilesService {
   }
 
   async removeFile(name: string) {
-    await this.minioService.removeObject(this._bucketCovers, name);
-    await this.minioService.removeObject(this._bucketSlides, name);
+    try {
+      if (!name || typeof name !== 'string') {
+        throw new BadRequestException('Invalid file name provided');
+      }
 
-    return `This action removes a #${name} file`;
+      this.logger.log(`Starting file removal process for file: ${name}`);
+
+      // Последовательное удаление файлов
+      const promises = [
+        this.minioService.removeObject(this._bucketCovers, name),
+        this.minioService.removeObject(this._bucketSlides, name),
+      ];
+
+      // Ожидание выполнения всех операций
+      await Promise.all(promises);
+
+      this.logger.log(`File ${name} successfully removed from all buckets`);
+
+      return `File #${name} has been successfully removed`;
+    } catch (error) {
+      // Обработка ошибок
+      this.logger.error(`Error removing file ${name}: ${error.message}`);
+
+      // if (error instanceof MinioError) {
+      //   throw new InternalServerErrorException(
+      //     `MinIO error occurred while removing file: ${error.message}`,
+      //   );
+      // }
+
+      throw new InternalServerErrorException(
+        'Failed to remove file. Please try again later.',
+      );
+    }
+
   }
 
   async getAvatarFile(filename: string, response: Response) {
