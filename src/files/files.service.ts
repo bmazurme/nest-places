@@ -28,7 +28,7 @@ export class FilesService {
   protected _bucketTmp = 'tmp';
   protected _bucketCovers = 'covers';
   protected _bucketSlides = 'slides';
-  protected _bucketAvatars = 'slides';
+  protected _bucketAvatars = 'avatars';
 
   constructor(
     private readonly usersService: UsersService,
