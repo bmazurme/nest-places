@@ -53,7 +53,7 @@ export class Card extends BaseEntity {
    * @isRequired
    * @relationship Many-to-One with User entity
    */
-  @ManyToOne(() => User, (user) => user.cards)
+  @ManyToOne(() => User, (user) => user.cards, { eager: true })
   user: User;
 
   /**
