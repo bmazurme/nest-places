@@ -56,8 +56,23 @@ export class CardsService {
       } catch (fileError) {
         throw new BadRequestException('Failed to process image file');
       }
+
+      const savedCard = await this.cardRepository.save(card);
+      const cardWithUser = await this.cardRepository.createQueryBuilder('card')
+        .select([
+          'card.id as id',
+          'card.name as name',
+          'card.link as link',
+          //  'tag.name as tagName', // Получаем имена тегов
+          'user.id as userid',
+          'user.name as username'
+        ])
+        .leftJoin('card.user', 'user')
+        .leftJoin('card.tags', 'tag')
+        .where('card.id = :id', { id: savedCard.id })
+        .getRawOne();
       
-      return this.cardRepository.save(card);
+      return cardWithUser;
     } catch (error) {
       this.logger.error(`Card create error ${error.message}`);
 
