@@ -6,7 +6,7 @@ import {
 import { Response } from 'express';
 import { randomUUID } from 'crypto';
 import * as Minio from 'minio';
-import * as sharp from 'sharp';
+import sharp from 'sharp';
 import { Readable } from 'stream';
 
 import { InjectMinio } from '../minio/minio.decorator';
