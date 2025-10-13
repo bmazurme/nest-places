@@ -47,7 +47,7 @@ export class CardsService {
 
       const card = new Card();
       card.name = createCardDto.name;
-      card.link = createCardDto.link;
+      card.link = createCardDto.link.replace('.jpg', '.webp');
       card.user = user;
       card.tags = [tag];
 
