@@ -40,23 +40,29 @@ export class FilesService {
   ) {}
 
   async uploadFile(file: Express.Multer.File) {
-    return new Promise((resolve, reject) => {
-      const filename = `${randomUUID().toString()}-${file.originalname}`;
+    try {
+      return new Promise((resolve, reject) => {
+        const filename = `${randomUUID().toString()}-${file.originalname}`;
 
-      this.minioService.putObject(
-        this._bucketTmp,
-        filename,
-        file.buffer,
-        file.size,
-        (error, objInfo) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve({ ...objInfo, filename });
-          }
-        },
-      );
-    });
+        this.minioService.putObject(
+          this._bucketTmp,
+          filename,
+          file.buffer,
+          file.size,
+          (error, objInfo) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve({ ...objInfo, filename });
+            }
+          },
+        );
+      });
+    } catch (error) {
+      this.logger.error(`Error uploading file: ${error.message}`);
+
+      throw new Error(`Error uploading file: ${error.message}`);
+    }
   }
 
   async resizeAndCopyImage(filename: string) {
@@ -67,25 +73,25 @@ export class FilesService {
       );
 
       const buffer = await streamToBuffer(fileStream);
+      const metadata = await sharp(buffer).metadata();
 
-      const cover = await sharp(buffer)
-        .toFormat('webp')
-        .resize(564, 564)
-        .toBuffer();
+      if (!metadata || !metadata.format) {
+        throw new BadRequestException('Invalid image format');
+      }
 
-      const slide = await sharp(buffer)
-        .toFormat('webp')
-        .resize(1000, 1000)
-        .toBuffer();
+      const processingTasks = [
+        this.processImage(buffer, 564, this._bucketCovers, 'cover', filename),
+        this.processImage(buffer, 1000, this._bucketSlides, 'slide', filename)
+      ];
 
-      await this.minioService.putObject(this._bucketCovers, filename, cover);
-      await this.minioService.putObject(this._bucketSlides, filename, slide);
+      await Promise.all(processingTasks);
 
-      return { filename };
+      return { filename: filename.replace('.jpg', '.webp') };
     } catch (error) {
-      console.error('Ошибка при обработке изображения:', error);
+      this.logger.error(`Error while processing image: ${error.message}`);
+
       throw new InternalServerErrorException(
-        'Произошла ошибка при обработке изображения',
+        'Error while processing image',
       );
     }
   }
@@ -111,7 +117,6 @@ export class FilesService {
 
       return `File #${name} has been successfully removed`;
     } catch (error) {
-      // Обработка ошибок
       this.logger.error(`Error removing file ${name}: ${error.message}`);
 
       // if (error instanceof MinioError) {
@@ -278,15 +283,49 @@ export class FilesService {
         avatar,
       );
 
-      // Обновляем информацию об аватаре в базе данных
       await this.usersService.updateAvatar(current);
 
       return current;
     } catch (error) {
-      // Обработка ошибок (можно добавить логирование)
+      this.logger.error(`Error update avatar: ${error.message}`);
+
       throw new InternalServerErrorException(
         'Ошибка при обработке или сохранении аватара',
       );
+    }
+  }
+
+  private async processImage(
+    buffer: Buffer,
+    size: number,
+    bucket: string,
+    type: string,
+    filename: string,
+  ): Promise<{ buffer: Buffer; size: number; format: string }> {
+    try {
+      const processed = await sharp(buffer)
+        .resize(size, size)
+        .toFormat('webp')
+        .toBuffer();
+
+      await this.minioService.putObject(
+        bucket,
+        filename.replace('.jpg', '.webp'),
+        processed,
+      );
+
+      return {
+        buffer: processed,
+        size: processed.length,
+        format: 'webp'
+      };
+    } catch (error) {
+      this.logger.error(
+        `Error processing ${type} image: ${error.message}`,
+        { error }
+      );
+
+      throw error;
     }
   }
 }
