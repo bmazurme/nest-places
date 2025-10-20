@@ -35,10 +35,12 @@ jobs:
           CR_HOST: ${{ secrets.CR_HOST }}
           CR_REGISTRY: ${{ secrets.CR_REGISTRY }}
           CR_IMAGE: ${{ secrets.CR_IMAGE }}
-          # IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $CR_HOST/$CR_REGISTRY/$CR_IMAGE:latest .
-          docker push $CR_HOST/$CR_REGISTRY/$CR_IMAGE:latest
+          # docker build -t $CR_HOST/$CR_REGISTRY/$CR_IMAGE:latest .
+          # docker push $CR_HOST/$CR_REGISTRY/$CR_IMAGE:latest
+          docker build -t $CR_HOST/$CR_REGISTRY/$CR_IMAGE:$IMAGE_TAG .
+          docker push $CR_HOST/$CR_REGISTRY/$CR_IMAGE:$IMAGE_TAG
 
   deploy:
     needs:
