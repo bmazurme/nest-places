@@ -68,13 +68,13 @@ jobs:
           user-data-path: './yc/user-data.yaml'
           docker-compose-path: './yc/main/docker-compose.yaml'
 
-      - name: Get VM IP
-        id: get-vm-ip
-        uses: yc-actions/yc-compute-instance-get@v1
-        with:
-          yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
-          folder-id: ${{ secrets.YC_FOLDER_ID }}
-          instance-name: ${{ secrets.YC_VM_NAME }}
+      # - name: Get VM IP
+      #   id: get-vm-ip
+      #   uses: yc-actions/yc-compute-instance-get@v1
+      #   with:
+      #     yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+      #     folder-id: ${{ secrets.YC_FOLDER_ID }}
+      #     instance-name: ${{ secrets.YC_VM_NAME }}
         
       - name: Check Docker status
         run: |
