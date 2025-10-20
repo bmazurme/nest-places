@@ -55,7 +55,6 @@ jobs:
           SSH_KEY: ${{ secrets.SSH_KEY }}
         with:
           yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
-
           folder-id: ${{ secrets.YC_FOLDER_ID }}
           vm-name: ${{ secrets.YC_VM_NAME }}
           vm-service-account-id: ${{ secrets.YC_SERVICE_ACCOUNT_ID }}
@@ -67,44 +66,3 @@ jobs:
           vm-core-fraction: 5
           user-data-path: './yc/user-data.yaml'
           docker-compose-path: './yc/main/docker-compose.yaml'
-
-      # - name: Get VM IP
-      #   id: get-vm-ip
-      #   uses: yc-actions/yc-compute-instance-get@v1
-      #   with:
-      #     yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
-      #     folder-id: ${{ secrets.YC_FOLDER_ID }}
-      #     instance-name: ${{ secrets.YC_VM_NAME }}
-        
-      # - name: Check Docker status
-      #   run: |
-      #     echo "Checking Docker status on VM..."
-      #     ssh -o StrictHostKeyChecking=no root@${{ steps.get-vm-ip.outputs.ip_address }} <<EOF
-      #       sudo systemctl status docker
-      #       docker ps -a
-      #       docker images
-      #       docker-compose version
-      #       docker logs backend
-      #       docker logs postgres
-      #       docker logs pgadmin
-      #       docker logs minio
-      #       docker logs loki
-      #       docker logs grafana
-      #     EOF
-
-      - name: Verify service status
-        run: |
-          echo "Verifying service status..."
-          ssh -o StrictHostKeyChecking=no root@${{ steps.get-vm-ip.outputs.ip_address }} <<EOF
-            systemctl status docker
-            docker-compose ps
-            docker-compose logs --tail=100
-          EOF
-
-      - name: Check network connectivity
-        run: |
-          echo "Checking network connectivity..."
-          ssh -o StrictHostKeyChecking=no root@${{ steps.get-vm-ip.outputs.ip_address }} <<EOF
-            netstat -tulpn
-            ufw status
-          EOF
