@@ -76,21 +76,21 @@ jobs:
       #     folder-id: ${{ secrets.YC_FOLDER_ID }}
       #     instance-name: ${{ secrets.YC_VM_NAME }}
         
-      - name: Check Docker status
-        run: |
-          echo "Checking Docker status on VM..."
-          ssh -o StrictHostKeyChecking=no root@${{ steps.get-vm-ip.outputs.ip_address }} <<EOF
-            sudo systemctl status docker
-            docker ps -a
-            docker images
-            docker-compose version
-            docker logs backend
-            docker logs postgres
-            docker logs pgadmin
-            docker logs minio
-            docker logs loki
-            docker logs grafana
-          EOF
+      # - name: Check Docker status
+      #   run: |
+      #     echo "Checking Docker status on VM..."
+      #     ssh -o StrictHostKeyChecking=no root@${{ steps.get-vm-ip.outputs.ip_address }} <<EOF
+      #       sudo systemctl status docker
+      #       docker ps -a
+      #       docker images
+      #       docker-compose version
+      #       docker logs backend
+      #       docker logs postgres
+      #       docker logs pgadmin
+      #       docker logs minio
+      #       docker logs loki
+      #       docker logs grafana
+      #     EOF
 
       - name: Verify service status
         run: |
