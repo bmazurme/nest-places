@@ -1,57 +1,49 @@
-# This is a basic workflow to help you get started with Actions
-
 name: Push To Yandex Cloud CR
 
-# Controls when the action will run.
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   release:
-    types: [created]
-
-  # Allows you to run this workflow manually from the Actions tab
+    types:
+      - created
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains two jobs called "build" and "deploy"
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v3  # Обновлено до последней версии
 
-      # Runs a single command using the runners shell
-      - name: Yandex Cloud CR "Login" Action for GitHub Actions
-        uses: yc-actions/yc-cr-login@v2
+      - name: Yandex Cloud CR Login
+        uses: yc-actions/yc-cr-login@v3  # Обновлено до последней версии
         with:
           yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
 
-      - name: Build, tag, and push image to Yandex Cloud Container Registry
+      - name: Build and push Docker image
         env:
           CR_HOST: ${{ secrets.CR_HOST }}
           CR_REGISTRY: ${{ secrets.CR_REGISTRY }}
           CR_IMAGE: ${{ secrets.CR_IMAGE }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          # docker build -t $CR_HOST/$CR_REGISTRY/$CR_IMAGE:latest .
-          # docker push $CR_HOST/$CR_REGISTRY/$CR_IMAGE:latest
-          docker build -t $CR_HOST/$CR_REGISTRY/$CR_IMAGE:$IMAGE_TAG .
-          docker push $CR_HOST/$CR_REGISTRY/$CR_IMAGE:$IMAGE_TAG
+          docker build \
+            -t "$CR_HOST/$CR_REGISTRY/$CR_IMAGE:$IMAGE_TAG" \
+            -t "$CR_HOST/$CR_REGISTRY/$CR_IMAGE:latest" .
+          docker push "$CR_HOST/$CR_REGISTRY/$CR_IMAGE:$IMAGE_TAG"
+          docker push "$CR_HOST/$CR_REGISTRY/$CR_IMAGE:latest"
 
   deploy:
-    needs:
-      - build
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v3  # Обновлено до последней версии
+
       - name: Deploy COI VM
         id: deploy-coi
-        uses: yc-actions/yc-coi-deploy@b22db2965c8af6bf0980e8b026c5e80ad6e15adf
+        uses: yc-actions/yc-coi-deploy@v3  # Обновлено до последней версии
         env:
           IMAGE_URL: ${{ secrets.CR_HOST }}/${{ secrets.CR_REGISTRY }}/${{ secrets.CR_IMAGE }}:${{ github.sha }}
           SSH_KEY: ${{ secrets.SSH_KEY }}
