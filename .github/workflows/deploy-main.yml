@@ -57,7 +57,8 @@ jobs:
           # vm-platform-id: 'standard-v2'
           vm-memory: 2Gb
           vm-disk-size: 30Gb
-          vm-core-fraction: 5
+          # vm-core-fraction: 5
+          vm-core-fraction: 20
           user-data-path: './yc/user-data.yaml'
           docker-compose-path: './yc/main/docker-compose.yaml'
 
