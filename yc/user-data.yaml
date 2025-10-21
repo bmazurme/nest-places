@@ -1,8 +1,15 @@
 #cloud-config
+# users:
+#   - name: {{ env.YC_VM_USERNAME }}
+#     groups: sudo
+#     shell: /bin/bash
+#     sudo: [ 'ALL=(ALL) NOPASSWD:ALL' ]
+#     ssh-authorized-keys:
+#       - {{ env.cat ~/.ssh/id_rsa.pub }}
 users:
   - name: {{ env.YC_VM_USERNAME }}
-    groups: sudo
+    groups: [sudo]
     shell: /bin/bash
-    sudo: [ 'ALL=(ALL) NOPASSWD:ALL' ]
+    sudo: ALL=(ALL) NOPASSWD:ALL
     ssh-authorized-keys:
-      - {{ env.cat ~/.ssh/id_rsa.pub }}
+      - "{{ secrets.SSH_KEY }}"
