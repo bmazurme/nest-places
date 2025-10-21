@@ -82,71 +82,39 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
-  
-    # frontend:
-    #   container_name: compose-front-container
-    #   build:
-    #     context: frontend
-    #     dockerfile: Dockerfile
-    #   image: cr.yandex/${CR_REGISTRY}/places-frontend:latest
-    #   networks:
-    #     - internet
-    #   ports:
-    #     - 8081:80
-    #   restart: unless-stopped
 
-  # # Redis
-  # redis:
-  #   container_name: places-redis
-  #   # platform: linux/x86_64
-  #   image: docker.io/bitnami/redis:7.0
-  #   command: redis-server --requirepass password
-  #   ports:
-  #     - 6379:6379
-  #   environment:
-  #     - REDIS_PASSWORD=password
-  #   networks:
-  #     - redis-network
+  backend:
+    container_name: compose-back-container
+    image: compose-backend-container
+    build:
+      dockerfile: Dockerfile
+    networks:
+      - internal-network
+      - internet
+    environment:
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-newPassword}
+      - POSTGRES_DB=${POSTGRES_DB:-my-db-name}
+      - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+      - JWT_SECRET=${JWT_SECRET}
+      - CLIENT_YANDEX_ID=${CLIENT_YANDEX_ID}
+      - CLIENT_YANDEX_SECRET=${CLIENT_YANDEX_SECRET}
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT}
+      - MINIO_PORT=${MINIO_PORT}
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
 
-  # redis-commander:
-  #   image: rediscommander/redis-commander:latest
-  #   restart: always
-  #   environment:
-  #     REDIS_HOSTS: redis
-  #     REDIS_HOST: redis
-  #     REDIS_PORT: redis:6379
-  #     REDIS_PASSWORD: password
-  #     HTTP_USER: root
-  #     HTTP_PASSWORD: root
-  #   ports:
-  #     - 8081:8081
-  #   networks:
-  #     - redis-network
-
-  # backend:
-  #   container_name: compose-back-container
-  #   build:
-  #     # context: backend
-  #     dockerfile: Dockerfile
-  #   image: cr.yandex/${CR_REGISTRY}/places-nest:latest
-  #   # platform: linux/amd64
-  #   networks:
-  #     - internal-network
-  #     - internet
-  #   ports:
-  #     - 4000:4000
-  #   restart: unless-stopped
-  #   env_file:
-  #     - .env
-  #   depends_on:
-  #     - postgres
-  #   volumes:
-  #     - ./uploads:/app/uploads
-  #     #- ./uploads:/usr/src/app/uploads
-
-# volumes:
-#   redis:
-#   redis-config:
+    ports:
+      - 3000:3000
+    depends_on:
+      - postgres
+      - minio
+      - grafana
+      - loki
+    restart: unless-stopped
 
 volumes:
   pgadmin-data:
