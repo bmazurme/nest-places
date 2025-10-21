@@ -43,7 +43,7 @@ jobs:
 
       - name: Deploy COI VM
         id: deploy-coi
-        uses: yc-actions/yc-coi-deploy@main  # Используем ветку main вместо версии
+        uses: yc-actions/yc-coi-deploy@b22db2965c8af6bf0980e8b026c5e80ad6e15adf
         env:
           IMAGE_URL: ${{ secrets.CR_HOST }}/${{ secrets.CR_REGISTRY }}/${{ secrets.CR_IMAGE }}:${{ github.sha }}
           SSH_KEY: ${{ secrets.SSH_KEY }}
