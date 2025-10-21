@@ -5,5 +5,6 @@ users:
     shell: /bin/bash
     sudo: [ 'ALL=(ALL) NOPASSWD:ALL' ]
     ssh-authorized-keys:
-      - {{ env.cat ~/.ssh/id_rsa.pub }}
+      - {{ env.SSH_KEY }}
+      # - {{ env.cat ~/.ssh/id_rsa.pub }}
 
