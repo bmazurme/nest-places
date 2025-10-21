@@ -47,6 +47,33 @@ services:
   backend:
     container_name: compose-back-container
     image: {{ env.IMAGE_URL }}
+    networks:
+      - internal-network
+      - internet
+    environment:
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-newPassword}
+      - POSTGRES_DB=${POSTGRES_DB:-my-db-name}
+      - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+      - JWT_SECRET=${JWT_SECRET}
+      - CLIENT_YANDEX_ID=${CLIENT_YANDEX_ID}
+      - CLIENT_YANDEX_SECRET=${CLIENT_YANDEX_SECRET}
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT}
+      - MINIO_PORT=${MINIO_PORT}
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+
+    ports:
+      - 3000:3000
+    depends_on:
+      - postgres
+      - minio
+      - grafana
+      - loki
+    restart: unless-stopped
 
 
   minio:
