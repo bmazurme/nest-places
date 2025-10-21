@@ -42,8 +42,8 @@ jobs:
           # docker build -t $CR_HOST/$CR_REGISTRY/$CR_IMAGE:$IMAGE_TAG .
           # docker push $CR_HOST/$CR_REGISTRY/$CR_IMAGE:$IMAGE_TAG
 
-          docker build -t $CR_HOST/$CR_REGISTRY/$CR_IMAGE:0.0.0 .
-          docker push $CR_HOST/$CR_REGISTRY/$CR_IMAGE:0.0.0
+          docker build -t $CR_HOST/$CR_REGISTRY/$CR_IMAGE:0.0.1 .
+          docker push $CR_HOST/$CR_REGISTRY/$CR_IMAGE:0.0.1
 
   deploy:
     needs:

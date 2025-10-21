@@ -44,9 +44,9 @@ services:
   #       parallelism: 1
   #       delay: 10s
 
-  # backend:
-  #   container_name: compose-back-container
-  #   image: {{ env.IMAGE_URL }}
+  backend:
+    container_name: compose-back-container
+    image: {{ env.IMAGE_URL }}
 
 
   minio:
