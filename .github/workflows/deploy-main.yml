@@ -39,8 +39,11 @@ jobs:
         run: |
           # docker build -t $CR_HOST/$CR_REGISTRY/$CR_IMAGE:latest .
           # docker push $CR_HOST/$CR_REGISTRY/$CR_IMAGE:latest
-          docker build -t $CR_HOST/$CR_REGISTRY/$CR_IMAGE:$IMAGE_TAG .
-          docker push $CR_HOST/$CR_REGISTRY/$CR_IMAGE:$IMAGE_TAG
+          # docker build -t $CR_HOST/$CR_REGISTRY/$CR_IMAGE:$IMAGE_TAG .
+          # docker push $CR_HOST/$CR_REGISTRY/$CR_IMAGE:$IMAGE_TAG
+
+          docker build -t $CR_HOST/$CR_REGISTRY/$CR_IMAGE:0.0.0 .
+          docker push $CR_HOST/$CR_REGISTRY/$CR_IMAGE:0.0.0
 
   deploy:
     needs:
