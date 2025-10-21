@@ -88,4 +88,3 @@ jobs:
           vm-core-fraction: 5
           user-data-path: './yc/user-data.yaml'
           docker-compose-path: './yc/main/docker-compose.yaml'
-

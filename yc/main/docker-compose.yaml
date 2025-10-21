@@ -1,26 +1,32 @@
 version: '3.7'
 services:
-  postgres:
-    image: postgres:13.2-alpine
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgresdata:/var/lib/postgresql/data
-      - ./migrations/dbinit.sql:/docker-entrypoint-initdb.d/dbinit.sql
+  tools_dev:
+    # container_name: tools
+    image: {{ env.IMAGE_URL }}
     restart: always
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-newPassword}
-      POSTGRES_DB: ${POSTGRES_DB:-my-db-name}
-    networks:
-      - internal-network
-      - internet
-    deploy:
-      resources:
-        limits:
-          memory: 2GB
-      restart_policy:
-        condition: on-failure
+    ports:
+      - '3000:3000'
+  # postgres:
+  #   image: postgres:13.2-alpine
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgresdata:/var/lib/postgresql/data
+  #     - ./migrations/dbinit.sql:/docker-entrypoint-initdb.d/dbinit.sql
+  #   restart: always
+  #   environment:
+  #     POSTGRES_USER: ${POSTGRES_USER:-postgres}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-newPassword}
+  #     POSTGRES_DB: ${POSTGRES_DB:-my-db-name}
+  #   networks:
+  #     - internal-network
+  #     - internet
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 2GB
+  #     restart_policy:
+  #       condition: on-failure
 
   # pgadmin:
   #   image: dpage/pgadmin4:4.18
@@ -144,19 +150,19 @@ services:
   #       parallelism: 1
   #       delay: 10s
 
-volumes:
-  postgresdata:
-    driver: local
-  pgadmin-data:
-    driver: local
-  minio-data:
-    driver: local
-  loki_data:
-    driver: local
-  grafana_data:
-    driver: local
+# volumes:
+#   postgresdata:
+#     driver: local
+#   pgadmin-data:
+#     driver: local
+#   minio-data:
+#     driver: local
+#   loki_data:
+#     driver: local
+#   grafana_data:
+#     driver: local
 
-networks:
-  internal-network:
-    driver: bridge
-    internal:
+# networks:
+#   internal-network:
+#     driver: bridge
+#     internal:
