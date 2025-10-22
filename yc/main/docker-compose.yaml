@@ -1,63 +1,63 @@
 version: '3.7'
 services:
-  tools_dev:
-    container_name: tools
+  # tools_dev:
+  #   container_name: tools
+  #   image: {{ env.IMAGE_URL }}
+  #   restart: always
+  #   ports:
+  #     - '3000:3000'
+  backend:
+    container_name: compose-back-container
     image: {{ env.IMAGE_URL }}
-    restart: always
+    networks:
+      - internal-network
+      - internet
+    environment:
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-newPassword}
+      - POSTGRES_DB=${POSTGRES_DB:-my-db-name}
+      - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+      - JWT_SECRET=${JWT_SECRET}
+      - CLIENT_YANDEX_ID=${CLIENT_YANDEX_ID}
+      - CLIENT_YANDEX_SECRET=${CLIENT_YANDEX_SECRET}
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT}
+      - MINIO_PORT=${MINIO_PORT}
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+
     ports:
-      - '3000:3000'
-#   backend:
-#     container_name: compose-back-container
-#     image: {{ env.IMAGE_URL }}
-#     networks:
-#       - internal-network
-#       - internet
-#     # environment:
-#     #   - POSTGRES_HOST=${POSTGRES_HOST}
-#     #   - POSTGRES_PORT=${POSTGRES_PORT}
-#     #   - POSTGRES_USER=${POSTGRES_USER:-postgres}
-#     #   - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-newPassword}
-#     #   - POSTGRES_DB=${POSTGRES_DB:-my-db-name}
-#     #   - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
-#     #   - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
-#     #   - JWT_SECRET=${JWT_SECRET}
-#     #   - CLIENT_YANDEX_ID=${CLIENT_YANDEX_ID}
-#     #   - CLIENT_YANDEX_SECRET=${CLIENT_YANDEX_SECRET}
-#     #   - MINIO_ENDPOINT=${MINIO_ENDPOINT}
-#     #   - MINIO_PORT=${MINIO_PORT}
-#     #   - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
-#     #   - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - 3000:3000
+    # depends_on:
+    #   - postgres
+    #   - minio
+    #   - grafana
+    #   - loki
+    restart: unless-stopped
 
-#     ports:
-#       - 3000:3000
-#     # depends_on:
-#     #   - postgres
-#     #   - minio
-#     #   - grafana
-#     #   - loki
-#     restart: unless-stopped
-
-#   postgres:
-#     image: postgres:13.2-alpine
-#     ports:
-#       - "5432:5432"
-#     volumes:
-#       - postgresdata:/var/lib/postgresql/data
-#       - ./migrations/dbinit.sql:/docker-entrypoint-initdb.d/dbinit.sql
-#     restart: always
-#     environment:
-#       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-#       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-newPassword}
-#       POSTGRES_DB: ${POSTGRES_DB:-my-db-name}
-#     networks:
-#       - internal-network
-#       - internet
-#     deploy:
-#       resources:
-#         limits:
-#           memory: 2GB
-#       restart_policy:
-#         condition: on-failure
+  postgres:
+    image: postgres:13.2-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgresdata:/var/lib/postgresql/data
+      - ./migrations/dbinit.sql:/docker-entrypoint-initdb.d/dbinit.sql
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-newPassword}
+      POSTGRES_DB: ${POSTGRES_DB:-my-db-name}
+    networks:
+      - internal-network
+      - internet
+    deploy:
+      resources:
+        limits:
+          memory: 2GB
+      restart_policy:
+        condition: on-failure
 
 # #   pgadmin:
 # #     image: dpage/pgadmin4:4.18
@@ -150,21 +150,21 @@ services:
 # #         parallelism: 1
 # #         delay: 10s
 
-# volumes:
-#   postgresdata:
-#     driver: local
-# #   pgadmin-data:
-# #     driver: local
-# #   minio-data:
-# #     driver: local
-# #   loki_data:
-# #     driver: local
-# #   grafana_data:
-# #     driver: local
+volumes:
+  postgresdata:
+    driver: local
+  pgadmin-data:
+    driver: local
+  minio-data:
+    driver: local
+  loki_data:
+    driver: local
+  grafana_data:
+    driver: local
 
-# networks:
-#   internal-network:
-#     driver: bridge
-#     internal: true
-#   internet:
-#     driver: bridge
+networks:
+  internal-network:
+    driver: bridge
+    internal: true
+  internet:
+    driver: bridge
