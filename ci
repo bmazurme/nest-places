@@ -1,0 +1,27 @@
+YC_SERVICE_ACCOUNT_ID aje1ro2gptfkbr6dbrk0 — ID сервисного аккаунта
+SSH_KEY — приватный SSH-ключ
+YC_SUBNET_ID e9b09qk7mvd979rbh6vl — ID подсети
+YC_VM_NAME ntlstl-places — имя виртуальной машины
+YC_FOLDER_ID b1gc6lm1t8q7tck4h2o2 — ID папки в Yandex Cloud
+YC_SA_JSON_CREDENTIALS — JSON-ключ сервисного аккаунта
+
+
+
+    # - name: Deploy COI VM
+    #   id: deploy-coi
+    #   uses: yc-actions/yc-coi-deploy@v2
+    #   env:
+    #     CR_REGISTRY: crp00000000000000000
+    #     CR_REPOSITORY: my-cr-repo
+    #     IMAGE_TAG: ${{ github.sha }}
+    #   with:
+    #     yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+    #     folder-id: bbajn5q2d74c********
+    #     vm-name: yc-action-demo
+    #     vm-service-account-id: ajeqnasj95o7********
+    #     vm-cores: 2
+    #     vm-memory: 2Gb
+    #     vm-core-fraction: 100
+    #     vm-subnet-id: e9b*********
+    #     user-data-path: './user-data.yaml'
+    #     docker-compose-path: './docker-compose.yaml'

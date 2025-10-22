@@ -39,3 +39,4 @@ postgresdata
 /uploads
 
 /documentation
+authorized_key.json
