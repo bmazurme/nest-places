@@ -83,7 +83,7 @@ services:
 
 
   minio:
-    image: bitnami/minio:2024.11.7
+    image: cr.yandex/crpfap56bqr8nkph7d9g/minio:2024.11.7 # bitnami/minio:2024.11.7
     restart: always
     ports:
       - '9000:9000'

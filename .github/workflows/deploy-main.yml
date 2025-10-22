@@ -34,7 +34,7 @@ jobs:
           docker push "$CR_HOST/$CR_REGISTRY/$CR_IMAGE:$IMAGE_TAG"
           docker push "$CR_HOST/$CR_REGISTRY/$CR_IMAGE:latest"
 
-          
+
   deploy:
     needs:
       - build
@@ -56,8 +56,8 @@ jobs:
           vm-subnet-id: ${{ secrets.YC_SUBNET_ID }}
           vm-cores: 2
           vm-platform-id: 'standard-v2'
-          vm-memory: 4Gb
+          vm-memory: 2Gb
           vm-disk-size: 30Gb
-          vm-core-fraction: 20
+          vm-core-fraction: 5
           user-data-path: './yc/user-data.yaml'
           docker-compose-path: './yc/main/docker-compose.yaml'
