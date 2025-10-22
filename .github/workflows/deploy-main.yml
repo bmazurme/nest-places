@@ -48,6 +48,7 @@ jobs:
         env:
           IMAGE_URL: cr.yandex/${{ secrets.CR_REGISTRY }}/${{ secrets.CR_IMAGE }}:${{ github.sha }}
           SSH_KEY: ${{ secrets.SSH_KEY }}
+          YC_VM_USERNAME: ${{ secrets.YC_VM_USERNAME }}
         with:
           yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
           folder-id: ${{ secrets.YC_FOLDER_ID }}
