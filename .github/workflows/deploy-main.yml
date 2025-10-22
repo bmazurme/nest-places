@@ -83,7 +83,7 @@ jobs:
           vm-subnet-id: ${{ secrets.YC_SUBNET_ID }}
           vm-cores: 2
           vm-platform-id: 'standard-v2'
-          vm-memory: 2Gb
+          vm-memory: 4Gb
           vm-disk-size: 30Gb
           vm-core-fraction: 5
           user-data-path: './yc/user-data.yaml'
