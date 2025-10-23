@@ -43,28 +43,10 @@ jobs:
           MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
         
         run: |
-          echo "CR_HOST: $CR_HOST"
-          echo "CR_REGISTRY: $CR_REGISTRY"
-          echo "CR_IMAGE: $CR_IMAGE"
-          echo "IMAGE_TAG: $IMAGE_TAG"
-          echo "POSTGRES_HOST: $POSTGRES_HOST"
-          echo "POSTGRES_PORT: $POSTGRES_PORT"
-          echo "POSTGRES_USER: $POSTGRES_USER"
-          echo "POSTGRES_PASSWORD: [MASKED]"
-          echo "POSTGRES_DB: $POSTGRES_DB"
-          echo "TELEGRAM_TOKEN: [MASKED]"
-          echo "TELEGRAM_CHAT_ID: $TELEGRAM_CHAT_ID"
-          echo "JWT_SECRET: [MASKED]"
-          echo "CLIENT_YANDEX_ID: $CLIENT_YANDEX_ID"
-          echo "CLIENT_YANDEX_SECRET: [MASKED]"
-          echo "MINIO_ENDPOINT: $MINIO_ENDPOINT"
-          echo "MINIO_PORT: $MINIO_PORT"
-          echo "MINIO_ACCESS_KEY: [MASKED]"
-          echo "MINIO_SECRET_KEY: [MASKED]"
-
           docker build \
             -t "$CR_HOST/$CR_REGISTRY/$CR_IMAGE:$IMAGE_TAG" \
             -t "$CR_HOST/$CR_REGISTRY/$CR_IMAGE:latest" .
+
           docker push "$CR_HOST/$CR_REGISTRY/$CR_IMAGE:$IMAGE_TAG"
           docker push "$CR_HOST/$CR_REGISTRY/$CR_IMAGE:latest"
 
