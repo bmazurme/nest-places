@@ -60,8 +60,8 @@ jobs:
           echo "MINIO_ENDPOINT: $MINIO_ENDPOINT"
           echo "MINIO_PORT: $MINIO_PORT"
           echo "MINIO_ACCESS_KEY: [MASKED]"
-          echo "MINIO_SECRET_KEY: [MASKED]"ё
-          
+          echo "MINIO_SECRET_KEY: [MASKED]"
+
           docker build \
             -t "$CR_HOST/$CR_REGISTRY/$CR_IMAGE:$IMAGE_TAG" \
             -t "$CR_HOST/$CR_REGISTRY/$CR_IMAGE:latest" .
