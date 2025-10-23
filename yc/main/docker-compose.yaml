@@ -25,7 +25,7 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - CLIENT_YANDEX_ID=${CLIENT_YANDEX_ID}
       - CLIENT_YANDEX_SECRET=${CLIENT_YANDEX_SECRET}
-      
+
       - MINIO_ENDPOINT=${MINIO_ENDPOINT}
       - MINIO_PORT=${MINIO_PORT}
       - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
@@ -35,7 +35,7 @@ services:
       - '3000:3000'
     depends_on:
       - postgres
-      # - minio
+      - minio
       # - grafana
       # - loki
     restart: unless-stopped
