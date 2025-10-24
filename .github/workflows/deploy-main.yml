@@ -53,7 +53,6 @@ jobs:
           docker push "$CR_HOST/$CR_REGISTRY/$CR_IMAGE:$IMAGE_TAG"
           docker push "$CR_HOST/$CR_REGISTRY/$CR_IMAGE:latest"
 
-
   deploy:
     needs:
       - build
@@ -61,25 +60,6 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
-        env:
-          IMAGE_URL: cr.yandex/${{ secrets.CR_REGISTRY }}/${{ secrets.CR_IMAGE }}:${{ github.sha }}
-          SSH_KEY: ${{ secrets.SSH_KEY }}
-          YC_VM_USERNAME: ${{ secrets.YC_VM_USERNAME }}
-          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
-          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          CLIENT_YANDEX_ID: ${{ secrets.CLIENT_YANDEX_ID }}
-          CLIENT_YANDEX_SECRET: ${{ secrets.CLIENT_YANDEX_SECRET }}
-          MINIO_ENDPOINT: ${{ secrets.MINIO_ENDPOINT }}
-          MINIO_PORT: ${{ secrets.MINIO_PORT }}
-          MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
-          MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
-
       - name: Deploy COI VM
         id: deploy-coi
         uses: yc-actions/yc-coi-deploy@v2
