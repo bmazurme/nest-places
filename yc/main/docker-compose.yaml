@@ -6,25 +6,25 @@ services:
     networks:
       - internal-network
       - internet
-    environment:
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_PORT=${POSTGRES_PORT}
-      - POSTGRES_USER=${POSTGRES_USER:-postgres}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-newPassword}
-      - POSTGRES_DB=${POSTGRES_DB:-my-db-name}
-      - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
-      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
-      - JWT_SECRET=${JWT_SECRET}
-      - CLIENT_YANDEX_ID=${CLIENT_YANDEX_ID}
-      - CLIENT_YANDEX_SECRET=${CLIENT_YANDEX_SECRET}
-      - MINIO_ENDPOINT=${MINIO_ENDPOINT}
-      - MINIO_PORT=${MINIO_PORT}
-      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
-      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
-    # env_file:
-    #   - /data/.env
-    volumes:
-      - /data/.env:/app/.env
+    # environment:
+    #   - POSTGRES_HOST=${POSTGRES_HOST}
+    #   - POSTGRES_PORT=${POSTGRES_PORT}
+    #   - POSTGRES_USER=${POSTGRES_USER:-postgres}
+    #   - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-newPassword}
+    #   - POSTGRES_DB=${POSTGRES_DB:-my-db-name}
+    #   - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
+    #   - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+    #   - JWT_SECRET=${JWT_SECRET}
+    #   - CLIENT_YANDEX_ID=${CLIENT_YANDEX_ID}
+    #   - CLIENT_YANDEX_SECRET=${CLIENT_YANDEX_SECRET}
+    #   - MINIO_ENDPOINT=${MINIO_ENDPOINT}
+    #   - MINIO_PORT=${MINIO_PORT}
+    #   - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+    #   - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+    env_file:
+      - /data/.env
+    # volumes:
+    #   - /data/.env:/app/.env
 
     ports:
       - "3000:3000"
