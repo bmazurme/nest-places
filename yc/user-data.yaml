@@ -20,12 +20,12 @@ users:
       - {{ env.SSH_KEY }}
 
 runcmd:
-  # Установка необходимых пакетов
-  - apt-get update && apt-get install -y jq
-  
-  # Получение секретов из Lockbox
-  - yc lockbox secret version get-payload e6qtf1j564cjrn1nkrkq --version-id latest --output json | jq -r '.payload' > /etc/secrets/secret1.txt
-  
   # Создание директории для секретов
   - mkdir -p /etc/secrets
   - chmod 700 /etc/secrets
+
+  # Получение секретов из Lockbox
+  - yc lockbox secret version get-payload e6qtf1j564cjrn1nkrkq --version-id latest --output еуче > /etc/secrets/secret1.txt
+
+  - chmod 600 /etc/secrets/secret1.txt
+  - chown root:root /etc/secrets/secret1.txt
