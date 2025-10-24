@@ -10,6 +10,7 @@ runcmd:
     --key config \
     --cloud-id "{{ env.YC_CLOUD_ID }}" \
     --folder-id "{{ env.YC_FOLDER_ID }}" > /data/test.conf
+    
 users:
   - name: {{ env.YC_VM_USERNAME }}
     groups: sudo
