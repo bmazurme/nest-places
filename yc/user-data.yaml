@@ -25,7 +25,7 @@ runcmd:
   - chmod 700 /etc/secrets
 
   # Получение секретов из Lockbox
-  - yc lockbox secret version get-payload e6qtf1j564cjrn1nkrkq --version-id latest --output еуче > /etc/secrets/secret1.txt
+  - yc lockbox secret version get-payload e6qtf1j564cjrn1nkrkq --version-id latest --output text > /etc/secrets/secret1.txt
 
   - chmod 600 /etc/secrets/secret1.txt
   - chown root:root /etc/secrets/secret1.txt
