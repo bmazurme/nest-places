@@ -1,16 +1,3 @@
-#cloud-config
-# runcmd:
-# - mkdir /run/yc
-# - "curl https://storage.yandexcloud.net/yandexcloud-yc/install.sh > /run/yc/install.sh"
-# - [ sudo, bash, /run/yc/install.sh]
-# - [ sudo, mkdir, /data ]
-# - "sudo /root/yandex-cloud/bin/yc ntlstl payload get --id {{ env.YC_SECRET_ID }} --key config --cloud-id {{ env.YC_CLOUD_ID }} --folder-id {{ env.YC_FOLDER_ID }} > /data/test.conf"
-# # - |
-# #   sudo /root/yandex-cloud/bin/yc lockbox payload get \
-# #     --id "{{ env.YC_SECRET_ID }}" \
-# #     --key config \
-# #     --cloud-id "{{ env.YC_CLOUD_ID }}" \
-# #     --folder-id "{{ env.YC_FOLDER_ID }}" > /data/test.conf
 users:
   - name: {{ env.YC_VM_USERNAME }}
     groups: sudo
@@ -18,14 +5,5 @@ users:
     sudo: [ 'ALL=(ALL) NOPASSWD:ALL' ]
     ssh-authorized-keys:
       - {{ env.SSH_KEY }}
-
-runcmd:
-  # Создание директории для секретов
-  - mkdir -p /etc/secrets
-  - chmod 700 /etc/secrets
-
-  # Получение секретов из Lockbox
-  - yc lockbox secret version get-payload e6qtf1j564cjrn1nkrkq --version-id latest --output text > /etc/secrets/secret1.txt
-
-  - chmod 600 /etc/secrets/secret1.txt
-  - chown root:root /etc/secrets/secret1.txt
+    runcmd:
+      - yc lockbox payload get-text e6qtf1j564cjrn1nkrkq --key config > /data/test.conf
