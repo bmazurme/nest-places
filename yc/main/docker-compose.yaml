@@ -17,6 +17,7 @@ services:
       # - loki
     restart: unless-stopped
 
+
   postgres:
     image: postgres:13.2-alpine
     ports:
