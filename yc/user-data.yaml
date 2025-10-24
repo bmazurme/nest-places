@@ -4,13 +4,13 @@ runcmd:
 - "curl https://storage.yandexcloud.net/yandexcloud-yc/install.sh > /run/yc/install.sh"
 - [ sudo, bash, /run/yc/install.sh]
 - [ sudo, mkdir, /data ]
-- |
-  sudo /root/yandex-cloud/bin/yc lockbox payload get \
-    --id "{{ env.YC_SECRET_ID }}" \
-    --key config \
-    --cloud-id "{{ env.YC_CLOUD_ID }}" \
-    --folder-id "{{ env.YC_FOLDER_ID }}" > /data/test.conf
-    
+- "sudo /root/yandex-cloud/bin/yc lockbox payload get --id {{ env.YC_SECRET_ID }} --key config --cloud-id {{ env.YC_CLOUD_ID }} --folder-id {{ env.YC_FOLDER_ID }} > /data/test.conf"
+# - |
+#   sudo /root/yandex-cloud/bin/yc lockbox payload get \
+#     --id "{{ env.YC_SECRET_ID }}" \
+#     --key config \
+#     --cloud-id "{{ env.YC_CLOUD_ID }}" \
+#     --folder-id "{{ env.YC_FOLDER_ID }}" > /data/test.conf
 users:
   - name: {{ env.YC_VM_USERNAME }}
     groups: sudo
