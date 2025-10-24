@@ -21,8 +21,10 @@ services:
       - MINIO_PORT=${MINIO_PORT}
       - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
-    env_file:
-      - /data/.env
+    # env_file:
+    #   - /data/.env
+    volumes:
+      - /data/.env:/app/.env
 
     ports:
       - "3000:3000"
