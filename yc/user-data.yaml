@@ -20,7 +20,6 @@ runcmd:
       --folder-id b1gc6lm1t8q7tck4h2o2 > /data/test.conf
     chmod 600 /data/test.conf
 
-
 users:
   - name: {{ env.YC_VM_USERNAME }}
     groups: sudo
