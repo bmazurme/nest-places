@@ -83,7 +83,7 @@ services:
     volumes:
       - /minio-data:/bitnami/minio/data
     networks:
-      - internal-network
+      # - internal-network
       - internet
     deploy:
       resources:
