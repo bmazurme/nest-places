@@ -1,0 +1,23 @@
+spec:
+  containers:
+  - command:
+    - sleep
+    args:
+    - 100000
+    env:
+    - name: MYENV
+      value: myvalue
+    image:  cr.yandex/mirror/ubuntu:22.04
+    name: my-container
+    securityContext:
+      privileged: false
+    stdin: false
+    tty: false
+    volumeMounts:
+      - mountPath: /home/yc-user/data
+        name: data-volume
+  restartPolicy: Always
+  volumes:
+    - name: data-volume
+      hostPath:
+        path: /data
