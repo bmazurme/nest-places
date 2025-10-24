@@ -4,8 +4,6 @@ runcmd:
 - "curl https://storage.yandexcloud.net/yandexcloud-yc/install.sh > /run/yc/install.sh"
 - [ sudo, bash, /run/yc/install.sh]
 - [ sudo, mkdir, /data ]
-# - "sudo /root/yandex-cloud/bin/yc lockbox payload get --id e6q7j69pdn0liphrlcmj --key config --cloud-id b1g758p24lvji8hnoto9 --folder-id b1gc6lm1t8q7tck4h2o2 > /data/test.conf"
-
 - |
   sudo /root/yandex-cloud/bin/yc lockbox payload get \
     --id "{{ env.YC_SECRET_ID }}" \
