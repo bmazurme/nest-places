@@ -1,9 +1,15 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  Logger,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Observable } from 'rxjs';
 
 @Injectable()
 export class CustomJwtGuard implements CanActivate {
+  private readonly logger = new Logger('UserService');
   constructor(private readonly jwtService: JwtService) {}
 
   canActivate(
@@ -21,11 +27,12 @@ export class CustomJwtGuard implements CanActivate {
     try {
       const decoded = this.jwtService.verify(token);
       request.userId = decoded.sub;
+      this.logger.log(`User id ${decoded.sub} from decoded.sub`);
     } catch (e) {
       // Игнорируем ошибку, оставляя userId = -1
     }
     // }
-
+    
     // Всегда разрешаем доступ
     return true;
   }
