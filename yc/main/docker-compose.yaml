@@ -86,10 +86,10 @@ services:
     networks:
       # - internal-network
       - internet
-    deploy:
-      resources:
-        limits:
-          memory: 2GB
+    # deploy:
+    #   resources:
+    #     limits:
+    #       memory: 2GB
 
   # loki:
   #   image: grafana/loki:latest
