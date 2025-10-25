@@ -43,6 +43,11 @@ export class AuthService {
       response.cookie('access_token', this.jwtService.sign(payload), {
         httpOnly: true,
         maxAge: 3600000,
+
+        secure: false,  // Только для HTTPS
+        
+        sameSite: 'none',  // Для междоменных запросов
+        domain: '.ntlstl.dev'  // Общий домен для всех поддоменов
       });
 
       response.redirect(TARGET_URL);
