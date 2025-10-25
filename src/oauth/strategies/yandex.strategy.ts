@@ -10,7 +10,7 @@ export class YandexStrategy extends PassportStrategy(Strategy, 'yandex') {
     super({
       clientID: configService.get('CLIENT_YANDEX_ID'),
       clientSecret: configService.get('CLIENT_YANDEX_SECRET'),
-      callbackURL: 'http://localhost:3000/oauth/yandex/redirect',
+      callbackURL: 'CLIENT_YANDEX_REDIRECT',
     });
   }
 
