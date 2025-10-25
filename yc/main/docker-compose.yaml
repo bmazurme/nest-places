@@ -1,15 +1,15 @@
 version: '3.7'
 services:
   backend:
-    container_name: backend-core
     image: {{ env.IMAGE_URL }}
+    container_name: backend-core
     networks:
-      - internal-network
+      # - internal-network
       - internet
     env_file:
       - /data/.env
     ports:
-      - 3000:3000
+      - "3000:3000"
     depends_on:
       - postgres
       - minio
@@ -20,31 +20,35 @@ services:
 
   postgres:
     image: postgres:13.2-alpine
+    container_name: postgres
+    restart: always
+    env_file:
+      - /data/.env
     ports:
-      - 5432:5432
+      - "5432:5432"
     volumes:
       - /postgresdata:/var/lib/postgresql/data
       - /migrations/dbinit.sql:/docker-entrypoint-initdb.d/dbinit.sql
-    restart: always
-    env_file:
-      - /data/.env
     networks:
-      - internal-network
       - internet
-    deploy:
-      resources:
-        limits:
-          memory: 2GB
-      restart_policy:
-        condition: on-failure
+    healthcheck:
+    test: ["CMD-SHELL", "pg_isready -U postgres"]
+    interval: 10s
+    timeout: 5s
+    retries: 5
 
   pgadmin:
-    image: dpage/pgadmin4:4.18
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
     restart: always
     env_file:
       - /data/.env
+    environment:
+      # PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      # PGADMIN_DEFAULT_PASSWORD: secret
+      PGADMIN_LISTEN_PORT: 80
     ports:
-      - 8080:80
+      - "8080:80"
     volumes:
       - /pgadmin-data:/var/lib/pgadmin
     depends_on:
@@ -54,14 +58,27 @@ services:
 
   minio:
     image: cr.yandex/crpfap56bqr8nkph7d9g/minio:2024.11.7
+    container_name: minio
     restart: always
     ports:
-      - 9000:9000
-      - 8000:8000
+      - "9000:9000"
+      - "8000:8000"
     env_file:
       - /data/.env
+    environment:
+      # MINIO_ROOT_USER: ${MINIO_ROOT_USER:-admin}
+      # MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-very-hard-password}
+      MINIO_DEFAULT_BUCKETS: 'main'
+      MINIO_CONSOLE_PORT_NUMBER: 8000
     volumes:
       - /minio-data:/bitnami/minio/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+      start_period: 30s
+    command: server /bitnami/minio/data --console-address ":8000"
     networks:
       - internet
 
