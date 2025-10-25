@@ -68,14 +68,15 @@ services:
 
 
   minio:
+    container_name: minio
     image: cr.yandex/crpfap56bqr8nkph7d9g/minio:2024.11.7 # bitnami/minio:2024.11.7
     restart: always
     ports:
-      - '9000:9000'
-      - '8000:8000'
+      - 9000:9000
+      - 8000:8000
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-admin}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-very-hard-password}
+      MINIO_ROOT_USER: 'admin'
+      MINIO_ROOT_PASSWORD: 'very-hard-password'
       MINIO_DEFAULT_BUCKETS: 'main'
       MINIO_API_PORT_NUMBER: 9000
       MINIO_CONSOLE_PORT_NUMBER: 8000
