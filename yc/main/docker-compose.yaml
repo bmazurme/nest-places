@@ -52,11 +52,6 @@ services:
     ports:
       - 9000:9000
       - 8000:8000
-    # environment:
-    #   MINIO_ROOT_USER: admin
-    #   MINIO_ROOT_PASSWORD: very-hard-password
-    #   MINIO_DEFAULT_BUCKETS: main
-    #   MINIO_CONSOLE_PORT_NUMBER: 8000
     volumes:
       - minio-data:/bitnami/minio/data
     networks:

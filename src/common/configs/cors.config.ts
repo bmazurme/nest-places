@@ -17,7 +17,7 @@ export const configureCors = (app: INestApplication) => {
     origin: [
       // 'http://localhost:5173',
       // 'http://localhost:3000',
-      // 'http://localhost:3005',
+      'http://localhost:3005',
     ],
 
     /**
