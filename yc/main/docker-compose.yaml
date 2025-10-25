@@ -55,7 +55,7 @@ services:
       MINIO_DEFAULT_BUCKETS: main
       MINIO_CONSOLE_PORT_NUMBER: 8000
     volumes:
-      - /minio-data:/bitnami/minio/data
+      - minio-data:/bitnami/minio/data
     networks:
       - internet
 
