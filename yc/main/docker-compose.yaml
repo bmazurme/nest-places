@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   backend:
-    container_name: backend-core
+    # container_name: backend-core
     image: {{ env.IMAGE_URL }}
     networks:
       - internet
@@ -37,7 +37,7 @@ services:
     ports:
       - 8080:80
     volumes:
-      - /pgadmin-data:/var/lib/pgadmin
+      - pgadmin-data:/var/lib/pgadmin
     depends_on:
       - postgres
     networks:
