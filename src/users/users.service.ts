@@ -65,6 +65,7 @@ export class UsersService {
   async findOne(id: number) {
     try {
       if (!Number.isInteger(id) || id <= 0) {
+        this.logger.error(`Invalid user ID - ${id}`);
         throw new BadRequestException('Invalid user ID');
       }
 
@@ -74,8 +75,11 @@ export class UsersService {
       });
 
       if (!user) {
+        this.logger.error(`user with id ${id} not found`);
         throw new NotFoundException(`user with id ${id} not found`);
       }
+
+      this.logger.log(`User ${user.id} successfully found`);
 
       return user;
     } catch (error) {
