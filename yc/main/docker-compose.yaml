@@ -49,8 +49,8 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: secret
       PGADMIN_LISTEN_PORT: 80
-    env_file:
-      - /data/.env
+    # env_file:
+    #   - /data/.env
     ports:
       - "8080:80"
     volumes:
@@ -60,11 +60,11 @@ services:
     networks:
       - internal-network
       - internet
-    deploy:
-      replicas: 1
-      update_config:
-        parallelism: 1
-        delay: 10s
+    # deploy:
+    #   replicas: 1
+    #   update_config:
+    #     parallelism: 1
+    #     delay: 10s
 
 
   minio:
