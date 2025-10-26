@@ -25,7 +25,7 @@ export class LikesService {
     try {
       const like = await this.likeRepository.findOne({
         where: {
-          card: createLikeDto.card,
+          card: { id: createLikeDto.card.id },
           user: { id: createLikeDto.user.id },
         },
       });
@@ -52,12 +52,10 @@ export class LikesService {
 
   async dislike(createLikeDto: CreateLikeDto) {
     try {
-      console.log(createLikeDto);
-
       const like = await this.likeRepository.findOne({
         where: {
-          card: createLikeDto.card,
-          user: createLikeDto.user,
+          card: { id: createLikeDto.card.id },
+          user: { id: createLikeDto.user.id },
         },
         select: { id: true },
       });
