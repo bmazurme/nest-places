@@ -1,4 +1,4 @@
-import { Entity, JoinTable, ManyToOne, Unique } from 'typeorm';
+import { Entity, Index, JoinColumn, JoinTable, ManyToOne, Unique } from 'typeorm';
 
 import { BaseEntity } from '../../base-entity';
 
@@ -14,7 +14,7 @@ export class Like extends BaseEntity {
   @ManyToOne(() => Card, (card) => card.likes, {
     onDelete: 'CASCADE',
   })
-  // @JoinColumn({ name: 'cardId' })
+  @Index()
   card: Card;
 
   @ManyToOne(() => User, (user) => user.likes)
