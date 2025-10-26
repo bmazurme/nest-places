@@ -26,7 +26,7 @@ async function streamToBuffer(stream: Readable): Promise<Buffer> {
 
 @Injectable()
 export class FilesService {
-  private readonly logger = new Logger('UserService');
+  private readonly logger = new Logger('FilesService');
 
   protected _bucketName = 'main';
   protected _bucketTmp = 'tmp';
