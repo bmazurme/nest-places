@@ -19,8 +19,9 @@ export class AuthService {
         httpOnly: true,
         secure: true,
         // secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        sameSite: 'none', // sameSite: 'strict',
         maxAge: 0,
+        domain: '.ntlstl.dev',
       });
 
       this.logger.log(`User ${user.id} successfully logged out`);
@@ -44,8 +45,8 @@ export class AuthService {
         httpOnly: true,
         maxAge: 3600000,
         secure: true,  // Только для HTTPS
-        sameSite: 'none',  // Для междоменных запросов
-        domain: '.ntlstl.dev'  // Общий домен для всех поддоменов
+        sameSite: 'none', // Для междоменных запросов
+        domain: '.ntlstl.dev',  // Общий домен для всех поддоменов
       });
 
       response.redirect(TARGET_URL);
