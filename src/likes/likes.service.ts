@@ -23,18 +23,18 @@ export class LikesService {
 
   async like(createLikeDto: CreateLikeDto) {
     try {
-      const like = await this.likeRepository.findOne({
-        where: {
-          card: { id: createLikeDto.card.id },
-          user: { id: createLikeDto.user.id },
-        },
-      });
+      // const like = await this.likeRepository.findOne({
+      //   where: {
+      //     card: { id: createLikeDto.card.id },
+      //     user: { id: createLikeDto.user.id },
+      //   },
+      // });
 
-      if (like) {
-        throw new BadRequestException('found');
-      }
+      // if (like) {
+      //   throw new BadRequestException('found');
+      // }
 
-      this.logger.log(`Adding a like to the card ${createLikeDto.card.id} by user ${createLikeDto.user.id}`);
+      // this.logger.log(`Adding a like to the card ${createLikeDto.card.id} by user ${createLikeDto.user.id}`);
 
       const { id } = await this.likeRepository.save(createLikeDto);
 
