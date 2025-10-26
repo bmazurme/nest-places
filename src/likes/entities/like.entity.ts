@@ -1,4 +1,4 @@
-import { Entity, JoinTable, ManyToOne } from 'typeorm';
+import { Entity, JoinTable, ManyToOne, Unique } from 'typeorm';
 
 import { BaseEntity } from '../../base-entity';
 
@@ -9,6 +9,7 @@ import { User } from '../../users/entities/user.entity';
  * Like entity
  */
 @Entity()
+@Unique(['card', 'user'])
 export class Like extends BaseEntity {
   @ManyToOne(() => Card, (card) => card.likes, {
     onDelete: 'CASCADE',
