@@ -57,30 +57,30 @@ services:
     networks:
       - internet
 
-  loki: 
-    image: grafana/loki:latest
-    ports:
-      - "3100:3100"
-    command: -config.file=/etc/loki/local-config.yaml
-    volumes:
-      - loki_data:/loki
-    networks:
-      - internet
-    restart: unless-stopped
+  # loki: 
+  #   image: grafana/loki:latest
+  #   ports:
+  #     - "3100:3100"
+  #   command: -config.file=/etc/loki/local-config.yaml
+  #   volumes:
+  #     - loki_data:/loki
+  #   networks:
+  #     - internet
+  #   restart: unless-stopped
 
-  grafana:
-    image: grafana/grafana:latest
-    ports:
-      - 3200:3000
-    env_file:
-      - /data/.env
-    depends_on:
-      - loki
-    volumes:
-      - grafana_data:/var/lib/grafana
-    networks:
-      - internet
-    restart: unless-stopped
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   ports:
+  #     - 3200:3000
+  #   env_file:
+  #     - /data/.env
+  #   depends_on:
+  #     - loki
+  #   volumes:
+  #     - grafana_data:/var/lib/grafana
+  #   networks:
+  #     - internet
+  #   restart: unless-stopped
 
   frontend:
     image: cr.yandex/crpfap56bqr8nkph7d9g/place-frontend:latest
