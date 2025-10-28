@@ -83,7 +83,7 @@ services:
   #   restart: unless-stopped
 
   frontend:
-    image: cr.yandex/crpfap56bqr8nkph7d9g/place-frontend:latest
+    image: cr.yandex/crpfap56bqr8nkph7d9g/places-frontend:latest
     ports:
       - 3005:80
     depends_on:
