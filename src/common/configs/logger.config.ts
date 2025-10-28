@@ -1,7 +1,7 @@
 import WinstonTelegram from 'winston-telegram';
 import { WinstonModule } from 'nest-winston';
 import { transports, format } from 'winston';
-// import LokiTransport from 'winston-loki';
+import LokiTransport from 'winston-loki';
 
 import 'winston-daily-rotate-file';
 
@@ -45,16 +45,17 @@ export const loggerConfig = {
           }),
         ),
       }),
-      // new LokiTransport({
-      //   host: 'http://127.0.0.1:3100',
-      //   labels: {
-      //     app: 'nest-places'
-      //   },
-      //   json: true,
-      //   format: format.json(),
-      //   replaceTimestamp: true,
-      //   onConnectionError: (err) => console.error(err),
-      // }),
+      new LokiTransport({
+        // host: 'http://127.0.0.1:3100',
+        host: 'http://loki:3100',
+        labels: {
+          app: 'nest-places'
+        },
+        json: true,
+        format: format.json(),
+        replaceTimestamp: true,
+        onConnectionError: (err) => console.error(err),
+      }),
     ],
   }),
 };
