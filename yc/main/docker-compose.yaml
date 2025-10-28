@@ -98,7 +98,6 @@ services:
       - internet
     restart: unless-stopped
 
-
 volumes:
   postgresdata:
     driver: local
