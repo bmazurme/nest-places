@@ -71,19 +71,22 @@ services:
       retries: 5
     restart: unless-stopped
 
-  # grafana:
-  #   image: grafana/grafana:latest
-  #   ports:
-  #     - 3200:3000
-  #   env_file:
-  #     - /data/.env
-  #   depends_on:
-  #     - loki
-  #   volumes:
-  #     - grafana_data:/var/lib/grafana
-  #   networks:
-  #     - internet
-  #   restart: unless-stopped
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - 3200:3000
+    env_file:
+      - /data/.env
+    depends_on:
+      - loki
+    volumes:
+      - grafana_data:/var/lib/grafana
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --tries=1 -O- http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
   frontend:
     image: cr.yandex/crpfap56bqr8nkph7d9g/front-places:latest
@@ -104,6 +107,7 @@ volumes:
   minio-data:
     driver: local
   loki_data:
+  grafana_data:
 
 networks:
   internal-network:
