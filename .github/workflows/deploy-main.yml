@@ -53,6 +53,7 @@ jobs:
           docker push "$CR_HOST/$CR_REGISTRY/$CR_IMAGE:$IMAGE_TAG"
           docker push "$CR_HOST/$CR_REGISTRY/$CR_IMAGE:latest"
 
+          
   deploy:
     needs:
       - build
