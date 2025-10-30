@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 import { User } from '../users/entities/user.entity';
-import { TARGET_URL } from '../common/configs/constants';
 
 @Injectable()
 export class AuthService {
@@ -11,7 +11,11 @@ export class AuthService {
 
   constructor(
     private readonly jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
+  getTargetUrl() {
+    return this.configService.get<string>('TARGET_URL');
+  }
 
   async logout(response: Response, user: User) {
     try {
@@ -49,7 +53,7 @@ export class AuthService {
         domain: '.ntlstl.dev',  // Общий домен для всех поддоменов
       });
 
-      response.redirect(TARGET_URL);
+      response.redirect(this.getTargetUrl());
 
       this.logger.log(`User ${currentUser.id} successfully signed in`);
     } catch (error) {

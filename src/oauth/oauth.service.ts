@@ -31,7 +31,8 @@ export class OAuthService {
         currentUser = await this.usersService.findByEmail(email);
 
         if (!currentUser) {
-          currentUser = await this.usersService.create({ email });
+          await this.usersService.create({ email });
+          currentUser = await this.usersService.findByEmail(email);
         }
 
         await this.cacheManager.set(email, currentUser);
