@@ -258,9 +258,10 @@ export class FilesService {
   async updateAvatar(file: Express.Multer.File, user: User) {
     // Получаем текущего пользователя из базы данных
     const current = await this.usersService.findOne(user.id);
+    const currentAvatar = current.avatar;
 
     // Генерируем уникальное имя файла с сохранением оригинального расширения
-    const uniqueFilename = `${randomUUID().toString()}-${file.originalname}`;
+    const uniqueFilename = `${randomUUID().toString()}-${file.originalname}.webp`;
     current.avatar = uniqueFilename;
 
     // Получаем буфер загруженного файла
@@ -284,6 +285,7 @@ export class FilesService {
       );
 
       await this.usersService.updateAvatar(current);
+      await this.minioService.removeObject(this._bucketAvatars, currentAvatar)
 
       return current;
     } catch (error) {
