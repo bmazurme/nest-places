@@ -37,7 +37,7 @@ export class User extends BaseEntity {
    * User avatar
    */
   @Column({
-    default: 'cat.jpg',
+    default: 'cat.webp',
   })
   @IsUrl()
   avatar: string;
