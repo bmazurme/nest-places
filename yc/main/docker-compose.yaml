@@ -14,6 +14,21 @@ services:
       - minio
     restart: unless-stopped
 
+
+  tools-backend:
+    image: cr.yandex/crpfap56bqr8nkph7d9g/tools-backend:latest
+    container_name: tools-backend
+    networks:
+      - internet
+    env_file:
+      - /data/.env
+    ports:
+      - 3400:3000
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+
   postgres:
     image: postgres:13.2-alpine
     container_name: postgres
