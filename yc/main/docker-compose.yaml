@@ -117,6 +117,16 @@ services:
       - internet
     restart: unless-stopped
 
+  tools-frontend:
+    image: cr.yandex/crpfap56bqr8nkph7d9g/tools-frontend:latest
+    ports:
+      - 3405:80
+    depends_on:
+      - tools-backend
+    networks:
+      - internet
+    restart: unless-stopped
+
 volumes:
   postgresdata:
     driver: local
