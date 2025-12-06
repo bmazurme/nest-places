@@ -17,6 +17,7 @@ import { UsersService } from './users.service';
 
 import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '../common/decorators/role.enum';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { JwtGuard } from '../common/guards/jwt.guard';
 
@@ -54,8 +55,8 @@ export class UsersController {
     summary: 'Get user info',
   })
   @Get('me')
-  findOne(@Req() req: { user: User }): Promise<User> {
-    return this.usersService.findOne(+req.user.id);
+  findOne(@CurrentUser() user: User): Promise<User> {
+    return this.usersService.findOne(+user.id);
   }
 
   /**
