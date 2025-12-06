@@ -23,6 +23,7 @@ import { GROUP_USER } from '../base-entity';
 
 import { JwtGuard } from '../common/guards/jwt.guard';
 import { CustomJwtGuard } from '../common/guards/custom.jwt.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
@@ -59,8 +60,8 @@ export class CardsController {
   @Post()
   @ApiResponse({ status: 201, description: 'Card created successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  create(@Body() createCardDto: CreateCardDto, @Req() req: { user: User }) {
-    return this.cardsService.create(createCardDto, req.user);
+  create(@Body() createCardDto: CreateCardDto, @CurrentUser() user: User) {
+    return this.cardsService.create(createCardDto, user);
   }
 
   /**
@@ -103,12 +104,12 @@ export class CardsController {
    */
   @UseGuards(JwtGuard)
   @Put(':id/likes')
-  async like(@Param('id') id: string, @Req() req: { user: User }) {
+  async like(@Param('id') id: string, @CurrentUser() user: User) {
     // return this.likesService.like({
     //   card: { id: +id },
     //   user: { id: req.user.id } as User,
     // });
-    return await this.cardsService.likeCard({ id: +id }, req.user);
+    return await this.cardsService.likeCard({ id: +id }, user);
   }
 
   /**
@@ -119,9 +120,9 @@ export class CardsController {
    */
   @UseGuards(JwtGuard)
   @Delete(':id/likes')
-  async dislike(@Param('id') id: string, @Req() req: { user: User }) {
+  async dislike(@Param('id') id: string, @CurrentUser() user: User) {
     // return this.likesService.dislike({ card: { id: +id }, user: req.user });
-    return await this.cardsService.dislikeCard({ id: +id }, req.user);
+    return await this.cardsService.dislikeCard({ id: +id }, user);
   }
 
   /**
@@ -134,8 +135,8 @@ export class CardsController {
   })
   @UseGuards(JwtGuard)
   @Delete(':id')
-  remove(@Param('id') id: string, @Req() req: { user: User }) {
-    return this.cardsService.remove(+id, req.user);
+  remove(@Param('id') id: string, @CurrentUser() user: User) {
+    return this.cardsService.remove(+id, user);
   }
 
   @UseGuards(JwtGuard)
@@ -196,7 +197,7 @@ export class CardsController {
   @ApiResponse({ status: 200, description: 'Card retrieved successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Card not found' })
-  findOne(@Param('id') id: string, @Req() req: { user: User }) {
-    return this.cardsService.getCardById(+id, req.user.id);
+  findOne(@Param('id') id: string, @CurrentUser() user: User) {
+    return this.cardsService.getCardById(+id, user.id);
   }
 }
