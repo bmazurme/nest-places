@@ -120,7 +120,6 @@ export class FilesController {
   updateAvatar(
     @UploadedFile()
     file: Express.Multer.File,
-
     @Req()
     req: { user: User },
   ) {
