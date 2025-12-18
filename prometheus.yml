@@ -4,4 +4,4 @@ scrape_configs:
     scrape_timeout: 10s
     metrics_path: '/metrics'
     static_configs:
-      - targets: ['backend:3000']
+      - targets: ['backend-core:3000']
