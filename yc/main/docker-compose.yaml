@@ -35,7 +35,7 @@ services:
     networks:
       - internet
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - /data/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus-data:/prometheus
     container_name: metr101-prometheus
     restart: unless-stopped
