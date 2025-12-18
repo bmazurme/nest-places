@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { PrometheusModule, makeCounterProvider } from '@willsoto/nestjs-prometheus';
+
 // import { ServeStaticModule } from '@nestjs/serve-static';
 // import { join } from 'path';
 
@@ -35,8 +37,17 @@ import { TypeOrmModuleConfig } from './common/configs';
     RolesModule,
     FilesModule,
     MinioModule,
+    PrometheusModule.register({
+      path: '/metrics',
+    }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    makeCounterProvider({
+      name: 'get_hello_calls',
+      help: 'Total number of getHello calls',
+    }),
+  ],
 })
 export class AppModule {}
