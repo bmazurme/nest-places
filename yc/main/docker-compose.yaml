@@ -28,6 +28,23 @@ services:
       - postgres
     restart: unless-stopped
 
+  metr101-prometheus:
+    image: prom/prometheus:v2.49.1
+    ports:
+      - 9090:9090
+    networks:
+      - internet
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    container_name: metr101-prometheus
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --tries=1 -O- http://localhost:9090/-/ready || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 
   postgres:
     image: postgres:13.2-alpine
@@ -136,6 +153,7 @@ volumes:
     driver: local
   loki_data:
   grafana_data:
+  prometheus-data:
 
 networks:
   internal-network:
