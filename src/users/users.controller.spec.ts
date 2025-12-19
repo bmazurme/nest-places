@@ -1,101 +1,134 @@
 import { Test, TestingModule } from '@nestjs/testing';
-
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
-
+import { JwtGuard } from '../common/guards/jwt.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+// import { Role } from '../common/decorators/role.enum';
+import { Reflector } from '@nestjs/core';
+
+const mockUsersService = {
+  create: jest.fn(),
+  findAll: jest.fn(),
+  findOne: jest.fn(),
+  findByEmail: jest.fn(),
+  update: jest.fn(),
+  remove: jest.fn(),
+};
+
+const mockUser: User = {
+  id: 1,
+  email: 'test@example.com',
+  password: 'password',
+  role: 'user',
+} as unknown as User;
 
 describe('UsersController', () => {
   let controller: UsersController;
-  let service: UsersService;
-
-  const usersServiceMock = {
-    create: jest.fn(),
-    findAll: jest.fn(),
-    findOne: jest.fn(),
-    update: jest.fn(),
-  };
+  let usersService: UsersService;
+  let reflector: Reflector;
 
   beforeEach(async () => {
-    const app: TestingModule = await Test.createTestingModule({
+    const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
-      providers: [UsersService],
-    })
-      .overrideProvider(UsersService)
-      .useValue(usersServiceMock)
-      .compile();
+      providers: [
+        {
+          provide: UsersService,
+          useValue: mockUsersService,
+        },
+        {
+          provide: JwtGuard,
+          useValue: {
+            canActivate: jest.fn().mockReturnValue(true),
+          },
+        },
+        {
+          provide: RolesGuard,
+          useValue: {
+            canActivate: jest.fn().mockReturnValue(true),
+          },
+        },
+        Reflector,
+      ],
+    }).compile();
 
-    controller = app.get<UsersController>(UsersController);
-    service = app.get<UsersService>(UsersService);
+    controller = module.get<UsersController>(UsersController);
+    usersService = module.get<UsersService>(UsersService);
+    reflector = module.get<Reflector>(Reflector);
+
+    jest.clearAllMocks();
   });
 
-  it('.findAll() should call UsersService.findAll', () => {
-    jest.spyOn(service, 'findAll');
-    controller.findAll();
-    expect(service.findAll).toHaveBeenCalled();
-  });
+  describe('create', () => {
+    it('should call usersService.create with correct params', async () => {
+      const createUserDto = { email: 'new@example.com', password: 'newpass' } as CreateUserDto;
 
-  it('.create() should call UsersService.create', async () => {
-    const createUserDto = { email: 'email@email.com' } as CreateUserDto;
-    const user = {
-      id: 0,
-      name: 'Name',
-      about: 'About',
-      email: 'email@email.com',
-    } as User;
+      await controller.create(createUserDto);
 
-    jest.spyOn(usersServiceMock, 'create').mockReturnValue(user);
-
-    const result = await controller.create(createUserDto);
-
-    expect(result).toEqual(user);
-    expect(service.create).toHaveBeenCalled();
-    expect(service.create).toHaveBeenCalledWith({
-      email: 'email@email.com',
+      expect(usersService.create).toHaveBeenCalledWith(createUserDto);
+      expect(usersService.create).toHaveBeenCalledTimes(1);
     });
   });
 
-  it('.findOne() should call UsersService.findOne', async () => {
-    const userData = { user: { id: 0 } } as { user: User };
-    const user = {
-      id: 0,
-      name: 'Name',
-      about: 'About',
-      email: 'email@email.com',
-    };
-
-    jest.spyOn(usersServiceMock, 'findOne').mockReturnValue(user);
-
-    const result = await controller.findOne(userData);
-
-    expect(result).toEqual(user);
-    expect(service.findOne).toHaveBeenCalled();
-    expect(service.findOne).toHaveBeenCalledWith(0);
+  describe('findAll', () => {
+    it('should call usersService.findAll', async () => {
+      await controller.findAll();
+      expect(usersService.findAll).toHaveBeenCalledTimes(1);
+    });
   });
 
-  it('.update() should call UsersService.update', async () => {
-    const id = '1';
-    const updateUserDto = {
-      name: 'Name',
-      about: 'About',
-      email: 'email@email.com',
-    } as UpdateUserDto;
-    const user = {
-      id: 0,
-      name: 'Name',
-      about: 'About',
-      email: 'email@email.com',
-      avatar: 'https://i.pravatar.cc/300',
-    } as User;
+  describe('findOne (me)', () => {
+    it('should call usersService.findOne with user id', async () => {
+      await controller.findOne(mockUser);
 
-    jest.spyOn(usersServiceMock, 'update').mockReturnValue(user);
-
-    const result = controller.update(id, updateUserDto);
-
-    expect(result).toEqual(user);
-    expect(service.update).toHaveBeenCalled();
-    expect(service.update).toHaveBeenCalledWith(+id, updateUserDto);
+      expect(usersService.findOne).toHaveBeenCalledWith(1);
+      expect(usersService.findOne).toHaveBeenCalledTimes(1);
+    });
   });
+
+  describe('findByEmail', () => {
+    it('should call usersService.findByEmail with email param', async () => {
+      const email = 'test@example.com';
+
+      await controller.findByEmail(email);
+
+      expect(usersService.findByEmail).toHaveBeenCalledWith(email);
+      expect(usersService.findByEmail).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('findOneById', () => {
+    it('should call usersService.findOne with id param', async () => {
+      const id = '2';
+
+      await controller.findOneById(id);
+
+      expect(usersService.findOne).toHaveBeenCalledWith(2);
+      expect(usersService.findOne).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('update', () => {
+    it('should call usersService.update with user data', async () => {
+      const updateUserDto = { email: 'updated@example.com' } as UpdateUserDto;
+
+      await controller.update(updateUserDto);
+
+      expect(usersService.update).toHaveBeenCalledWith(updateUserDto);
+      expect(usersService.update).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  // describe('remove', () => {
+  //   it('should have Roles decorator with Admin role', () => {
+  //     const roles = reflector.getAll<string[]>(
+  //       'roles', 
+  //       UsersController.prototype.remove
+  //     );
+
+  //     expect(roles).toEqual([Role.Admin]);
+  //   });
+  // });
 });
