@@ -71,27 +71,29 @@ describe('UsersService', () => {
     expect(service.findOne).toHaveBeenCalledWith(0);
   });
 
-  it('.update() should call UsersService.update', async () => {
-    const id = '1';
-    const updateUserDto = {
-      name: 'Name',
-      about: 'About',
-      email: 'email@email.com',
-    } as UpdateUserDto;
-    const user = {
-      id: 0,
-      name: 'Name',
-      about: 'About',
-      email: 'email@email.com',
-      avatar: 'https://i.pravatar.cc/300',
-    } as User;
+it('.update() should call UsersService.update', async () => {
+  const id = '1';
+  const updateUserDto = {
+    name: 'Name',
+    about: 'About',
+    email: 'email@email.com',
+  } as UpdateUserDto;
+  const user = {
+    id: 0,
+    name: 'Name',
+    about: 'About',
+    email: 'email@email.com',
+    avatar: 'https://i.pravatar.cc/300',
+  } as User;
 
-    jest.spyOn(usersServiceMock, 'update').mockReturnValue(user);
+  jest.spyOn(usersServiceMock, 'update').mockReturnValue(user);
 
-    const result = service.update(+id, updateUserDto);
+  const result = await service.update(updateUserDto);
 
-    expect(result).toEqual(user);
-    expect(service.update).toHaveBeenCalled();
-    expect(service.update).toHaveBeenCalledWith(+id, updateUserDto);
-  });
+  expect(result).toEqual(user);
+  expect(service.update).toHaveBeenCalled();
+  // Исправленная проверка: только DTO
+  expect(service.update).toHaveBeenCalledWith(updateUserDto);
+});
+
 });
