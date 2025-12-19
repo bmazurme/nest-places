@@ -92,7 +92,6 @@ it('.update() should call UsersService.update', async () => {
 
   expect(result).toEqual(user);
   expect(service.update).toHaveBeenCalled();
-  // Исправленная проверка: только DTO
   expect(service.update).toHaveBeenCalledWith(updateUserDto);
 });
 
