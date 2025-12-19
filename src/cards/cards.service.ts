@@ -8,6 +8,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { InjectMetric } from '@willsoto/nestjs-prometheus';
+import { Counter } from 'prom-client';
 
 import { Card } from './entities/card.entity';
 import { User } from '../users/entities/user.entity';
@@ -29,6 +31,8 @@ export class CardsService {
     private readonly likesService: LikesService,
     private readonly tagsService: TagsService,
     private readonly filesService: FilesService,
+    @InjectMetric('get_cards_calls')
+    public counter: Counter<string>,
   ) {}
 
   async create(createCardDto: CreateCardDto, user: User) {
@@ -281,6 +285,7 @@ export class CardsService {
   }
 
   async getCardsByPage(page: number = 0, currentUser: number) {
+    this.counter.inc();
     const PAGE_SIZE = 3;
 
     try {
