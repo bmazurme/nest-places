@@ -39,6 +39,9 @@ import { TypeOrmModuleConfig } from './common/configs';
     MinioModule,
     PrometheusModule.register({
       path: '/metrics',
+      // defaultMetrics: {
+      //   enabled: false,
+      // },
     }),
   ],
   controllers: [AppController],

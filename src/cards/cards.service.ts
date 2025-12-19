@@ -286,6 +286,7 @@ export class CardsService {
 
   async getCardsByPage(page: number = 0, currentUser: number) {
     this.counter.inc();
+    
     const PAGE_SIZE = 3;
 
     try {
