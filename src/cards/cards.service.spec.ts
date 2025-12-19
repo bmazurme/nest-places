@@ -1,22 +1,65 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { BadRequestException, InternalServerErrorException } from '@nestjs/common';
 
 import { CardsService } from './cards.service';
-import { Card } from './entities/card.entity';
+import { LikesService } from '../likes/likes.service';
+import { TagsService } from '../tags/tags.service';
+import { FilesService } from '../files/files.service';
 
-import { UpdateCardDto } from './dto/update-card.dto';
-// import { CreateCardDto } from './dto/create-card.dto';
+import { Card } from './entities/card.entity';
+import { User } from '../users/entities/user.entity';
+
+import { CreateCardDto } from './dto/create-card.dto';
+
+const mockUser: User = {
+  id: 1,
+  email: 'test@example.com',
+  password: 'password',
+  name: 'Test User',
+} as unknown as User;
+
+const mockCard: Card = {
+  id: 1,
+  name: 'Test Card',
+  link: 'test.webp',
+  user: mockUser,
+} as Card;
+
+const mockCardRepository = {
+  save: jest.fn(),
+  findOne: jest.fn(),
+  update: jest.fn(),
+  delete: jest.fn(),
+  find: jest.fn(),
+  countBy: jest.fn(),
+  query: jest.fn(),
+    createQueryBuilder: jest.fn().mockReturnValue({
+    select: jest.fn().mockReturnThis(),
+    leftJoin: jest.fn().mockReturnThis(),
+    where: jest.fn().mockReturnThis(),
+    getRawOne: jest.fn().mockResolvedValue(mockCard),
+  }),
+};
+
+const mockLikesService = {
+  like: jest.fn(),
+  dislike: jest.fn(),
+};
+
+const mockTagsService = {
+  findByNameOrCreate: jest.fn(),
+};
+
+const mockFilesService = {
+  resizeAndCopyImage: jest.fn(),
+  removeFile: jest.fn(),
+};
 
 describe('CardsService', () => {
   let service: CardsService;
-
-  const cardsServiceMock = {
-    create: jest.fn(),
-    findAll: jest.fn(),
-    findOne: jest.fn(),
-    update: jest.fn(),
-    remove: jest.fn(),
-  };
+  let cardRepository: Repository<Card>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -24,92 +67,90 @@ describe('CardsService', () => {
         CardsService,
         {
           provide: getRepositoryToken(Card),
-          useValue: {},
+          useValue: mockCardRepository,
+        },
+        {
+          provide: LikesService,
+          useValue: mockLikesService,
+        },
+        {
+          provide: TagsService,
+          useValue: mockTagsService,
+        },
+        {
+          provide: FilesService,
+          useValue: mockFilesService,
         },
       ],
-    })
-      .overrideProvider(CardsService)
-      .useValue(cardsServiceMock)
-      .compile();
+    }).compile();
 
     service = module.get<CardsService>(CardsService);
+    cardRepository = module.get<Repository<Card>>(getRepositoryToken(Card));
+
+    jest.clearAllMocks();
   });
 
-  // it('.findAll() should call CardsService.findAll', () => {
-  //   jest.spyOn(service, 'findAll');
-  //   service.findAll();
-  //   expect(service.findAll).toHaveBeenCalled();
-  // });
+  describe('create', () => {
+    it('should create card with valid data', async () => {
+      const createCardDto: CreateCardDto = {
+        name: 'New Card',
+        link: 'image.jpg',
+        tagName: 'test',
+        user: new User
+      };
 
-  // it('.create() should call CardsService.create', () => {
-  //   const createTagDto = { name: 'Name', link: '', userId: 0 } as CreateCardDto;
-  //   const card = {
-  //     id: 0,
-  //     name: 'Name',
-  //     link: '',
-  //     userId: 0,
-  //   } as unknown as Card;
+      mockTagsService.findByNameOrCreate.mockResolvedValue({ id: 1 });
+      mockFilesService.resizeAndCopyImage.mockResolvedValue(undefined); // Успех
+      mockCardRepository.save.mockResolvedValue(mockCard);
 
-  //   jest.spyOn(cardsServiceMock, 'create').mockReturnValue(card);
+      const result = await service.create(createCardDto, mockUser);
 
-  //   const result = service.create(createTagDto);
+      expect(mockTagsService.findByNameOrCreate).toHaveBeenCalledWith('test');
+      expect(mockFilesService.resizeAndCopyImage).toHaveBeenCalledWith('image.jpg');
+      expect(mockCardRepository.save).toHaveBeenCalled();
+      expect(result).toEqual(mockCard);
+    });
 
-  //   expect(result).toEqual(card);
-  //   expect(service.create).toHaveBeenCalled();
-  //   expect(service.create).toHaveBeenCalledWith({
-  //     name: 'Name',
-  //     link: '',
-  //     userId: 0,
-  //   });
-  // });
+    it('should throw BadRequestException for invalid card data', async () => {
+      await expect(service.create(null, mockUser)).rejects.toThrow(BadRequestException);
+      await expect(
+        service.create({ name: '', link: '' } as CreateCardDto, mockUser),
+      ).rejects.toThrow(BadRequestException);
+    });
 
-  // it('.findOne() should call CardsService.findOne', () => {
-  //   const id = '0';
-  //   const card = {
-  //     id: 0,
-  //     name: 'Name',
-  //     link: '',
-  //     userId: 0,
-  //   } as unknown as Card;
+    it('should throw BadRequestException if image processing fails', async () => {
+      const createCardDto: CreateCardDto = {
+        name: 'Card with bad image',
+        link: 'broken.jpg',
+        tagName: 'test',
+        user: new User
+      };
 
-  //   jest.spyOn(cardsServiceMock, 'findOne').mockReturnValue(card);
+      mockTagsService.findByNameOrCreate.mockResolvedValue({ id: 1 });
+      mockFilesService.resizeAndCopyImage.mockRejectedValue(new Error('Image processing failed'));
 
-  //   const result = service.findOne(+id);
+      await expect(service.create(createCardDto, mockUser))
+        .rejects
+        .toThrow(BadRequestException);
 
-  //   expect(result).toEqual(card);
-  //   expect(service.findOne).toHaveBeenCalled();
-  //   expect(service.findOne).toHaveBeenCalledWith(0);
-  // });
+      expect(mockFilesService.resizeAndCopyImage).toHaveBeenCalledWith('broken.jpg');
+    });
 
-  it('.update() should call CardsService.update', () => {
-    const id = '1';
-    const updateCardDto = { name: 'Name', link: '' } as UpdateCardDto;
-    const card = { id: 0, name: 'Name' } as Card;
+    it('should throw InternalServerErrorException if DB save fails', async () => {
+      const createCardDto: CreateCardDto = {
+        name: 'Card with DB error',
+        link: 'image.jpg',
+        tagName: 'test',
+        user: new User
+      };
 
-    jest.spyOn(cardsServiceMock, 'update').mockReturnValue(card);
+      mockTagsService.findByNameOrCreate.mockResolvedValue({ id: 1 });
+      mockFilesService.resizeAndCopyImage.mockResolvedValue(undefined);
+      mockCardRepository.save.mockRejectedValue(new Error('DB save failed'));
 
-    const result = service.update(+id, updateCardDto);
-
-    expect(result).toEqual(card);
-    expect(service.update).toHaveBeenCalled();
-    expect(service.update).toHaveBeenCalledWith(+id, updateCardDto);
-  });
-
-  it('.remove() should call CardsService.remove', async () => {
-    const id = '1';
-    const card = {
-      id: 1,
-      name: 'Name',
-      link: '',
-      userId: 0,
-    } as unknown as Card;
-
-    jest.spyOn(cardsServiceMock, 'remove').mockReturnValue(card);
-
-    const result = service.remove(+id);
-
-    expect(result).toEqual(card);
-    expect(service.remove).toHaveBeenCalled();
-    expect(service.remove).toHaveBeenCalledWith(+id);
+      await expect(service.create(createCardDto, mockUser))
+        .rejects
+        .toThrow(InternalServerErrorException);
+    });
   });
 });
