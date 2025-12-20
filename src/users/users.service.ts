@@ -5,9 +5,9 @@ import {
   Logger,
   InternalServerErrorException,
 } from '@nestjs/common';
-
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Counter, Histogram, register } from 'prom-client';
 
 import { User } from './entities/user.entity';
 
@@ -18,6 +18,31 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UsersService {
   private readonly logger = new Logger('UserService');
 
+  private createUserCounter = new Counter({
+    name: 'users_create_total',
+    help: 'Total number of created users',
+    labelNames: ['success'],
+  });
+
+  private findUserHistogram = new Histogram({
+    name: 'users_find_duration_seconds',
+    help: 'Duration of user find operations',
+    labelNames: ['operation'],
+    buckets: [0.1, 0.5, 1, 2, 5], // сек
+  });
+
+  private updateUserCounter = new Counter({
+    name: 'users_update_total',
+    help: 'Total number of updated users',
+    labelNames: ['success'],
+  });
+
+  private deleteUserCounter = new Counter({
+    name: 'users_delete_total',
+    help: 'Total number of deleted users',
+    labelNames: ['success'],
+  });
+
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -25,6 +50,8 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto) {
     const { email } = createUserDto;
+
+    const end = this.findUserHistogram.startTimer({ operation: 'create' });
     
     try {
       const existUsers = await this.findByEmail(email);
@@ -33,22 +60,30 @@ export class UsersService {
         throw new BadRequestException(`user with email ${email} exist`);
       }
 
-      return await this.userRepository.save(createUserDto);
+      const user = await this.userRepository.save(createUserDto);
+      this.createUserCounter.inc({ success: 'true' });
+
+      return this.userRepository;
     } catch (error) {
       this.logger.error(error.message);
+
+      this.createUserCounter.inc({ success: 'false' });
 
       if (error instanceof BadRequestException) {
         throw error;
       }
 
       throw new InternalServerErrorException('create user error');
+    } finally {
+      end();
     }
   }
 
   async findAll() {
+    const end = this.findUserHistogram.startTimer({ operation: 'findAll' });
+
     try {
       return await this.userRepository.find({
-        // relations: ['roles'],
         select: {
           id: true,
           name: true,
@@ -59,10 +94,14 @@ export class UsersService {
     } catch (error) {
       this.logger.error(error.message);
       throw new InternalServerErrorException(error.message);
+    } finally {
+      end();
     }
   }
 
   async findOne(id: number) {
+    const end = this.findUserHistogram.startTimer({ operation: 'findOne' });
+
     try {
       if (!Number.isInteger(id) || id <= 0) {
         this.logger.error(`Invalid user ID - ${id}`);
@@ -85,6 +124,8 @@ export class UsersService {
     } catch (error) {
       this.logger.error('Update user error');
       throw error;
+    } finally {
+      end();
     }
   }
 
@@ -112,6 +153,8 @@ export class UsersService {
   }
 
   async update(updateUserDto: UpdateUserDto) {
+    const end = this.findUserHistogram.startTimer({ operation: 'update' });
+
     try {
       const user = await this.userRepository.findOne({
         where: { id: updateUserDto.id },
@@ -127,14 +170,21 @@ export class UsersService {
         name: updateUserDto.name,
         about: updateUserDto.about,
       });
+      
+      this.updateUserCounter.inc({ success: 'true' });
 
-      return { ...user,
+      return {
+        ...user,
         name: updateUserDto.name,
         about: updateUserDto.about,
       };
     } catch (error) {
       this.logger.error('Update user error');
+      this.updateUserCounter.inc({ success: 'false' });
+
       throw error;
+    } finally {
+      end();
     }
   }
 
@@ -164,6 +214,8 @@ export class UsersService {
       throw new BadRequestException('Invalid user ID');
     }
 
+    const end = this.findUserHistogram.startTimer({ operation: 'delete' });
+
     try {
       const user = await this.userRepository.findOne({
         where: { id },
@@ -175,10 +227,19 @@ export class UsersService {
 
       this.logger.log(`Удаление пользователя с ID: ${id}`);
       
-      return this.userRepository.delete(id);
+      await this.userRepository.delete(id);
+
+      this.deleteUserCounter.inc({ success: 'true' });
+
+      return { deleted: true };
     } catch (error) {
       this.logger.error(`Delete user with ID: ${id}`);
+      
+      this.deleteUserCounter.inc({ success: 'false' });
+
       throw error;
+    } finally {
+      end();
     }
   }
 }
