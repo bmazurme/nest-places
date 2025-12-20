@@ -2,10 +2,9 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { makeCounterProvider, PrometheusModule } from '@willsoto/nestjs-prometheus';
+import { makeCounterProvider } from '@willsoto/nestjs-prometheus';
 
 import { CardsService } from './cards.service';
-
 import { CardsController } from './cards.controller';
 import { Card } from './entities/card.entity';
 import { LikesModule } from '../likes/likes.module';
@@ -34,7 +33,6 @@ import { FilesModule } from '../files/files.module';
       name: 'get_cards_calls',
       help: 'Total number of getCards calls',
     }),
-
   ],
   exports: [CardsService],
 })
