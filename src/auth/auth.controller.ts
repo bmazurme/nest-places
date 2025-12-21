@@ -15,6 +15,7 @@ import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { JwtGuard } from '../common/guards/jwt.guard';
 import { AuthService } from './auth.service';
 import { User } from '../users/entities/user.entity';
+import { CurrentUser } from './decorators/current-user.decorator';
 
 @UseGuards(JwtGuard)
 @Controller('auth')
@@ -35,8 +36,8 @@ export class AuthController {
   })
   logout(
     @Res({ passthrough: true }) response: Response,
-    @Req() req: { user: User },
+    @CurrentUser() user: User,
   ) {
-    return this.authService.logout(response, req.user);
+    return this.authService.logout(response, user);
   }
 }
