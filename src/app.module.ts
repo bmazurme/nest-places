@@ -22,10 +22,6 @@ import { TypeOrmModuleConfig } from './common/configs';
 
 @Module({
   imports: [
-    // ServeStaticModule.forRoot({
-    //   rootPath: join(__dirname, '..', 'uploads'),
-    //   serveStaticOptions: { index: false },
-    // }),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModuleConfig,
     OAuthModule,
