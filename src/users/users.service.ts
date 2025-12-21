@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Counter, Histogram, register } from 'prom-client';
+import { Counter, Histogram } from 'prom-client';
 
 import { User } from './entities/user.entity';
 
@@ -16,7 +16,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
-  private readonly logger = new Logger('UserService');
+  private readonly logger = new Logger(UsersService.name);
 
   private createUserCounter = new Counter({
     name: 'users_create_total',
@@ -122,7 +122,7 @@ export class UsersService {
 
       return user;
     } catch (error) {
-      this.logger.error('Update user error');
+      this.logger.error('findOne error');
       throw error;
     } finally {
       end();
