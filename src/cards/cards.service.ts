@@ -23,7 +23,7 @@ import { UpdateCardDto } from './dto/update-card.dto';
 
 @Injectable()
 export class CardsService {
-  private readonly logger = new Logger('CardsService');
+  private readonly logger = new Logger(CardsService.name);
   
   constructor(
     @InjectRepository(Card)
