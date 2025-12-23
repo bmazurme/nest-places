@@ -7,41 +7,38 @@ import {
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Counter, Histogram } from 'prom-client';
 
 import { User } from './entities/user.entity';
-
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import {
+  createRequestCounter,
+  createRequestDurationHistogram,
+} from '../metrics/metrics.provider';
 
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
 
-  private createUserCounter = new Counter({
-    name: 'users_create_total',
-    help: 'Total number of created users',
-    labelNames: ['success'],
-  });
+  private createUserCounter = createRequestCounter(
+    'users_create_total',
+    'Total number of created users',
+  );
 
-  private findUserHistogram = new Histogram({
-    name: 'users_find_duration_seconds',
-    help: 'Duration of user find operations',
-    labelNames: ['operation'],
-    buckets: [0.1, 0.5, 1, 2, 5], // сек
-  });
+  private findUserHistogram = createRequestDurationHistogram(
+    'users_find_duration_seconds',
+    'Duration of user find operations',
+  );
 
-  private updateUserCounter = new Counter({
-    name: 'users_update_total',
-    help: 'Total number of updated users',
-    labelNames: ['success'],
-  });
+  private updateUserCounter = createRequestCounter(
+    'users_update_total',
+    'Total number of updated users',
+  );
 
-  private deleteUserCounter = new Counter({
-    name: 'users_delete_total',
-    help: 'Total number of deleted users',
-    labelNames: ['success'],
-  });
+  private deleteUserCounter = createRequestCounter(
+    'users_delete_total',
+    'Total number of deleted users',
+  );
 
   constructor(
     @InjectRepository(User)
