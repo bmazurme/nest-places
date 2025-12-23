@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { makeCounterProvider } from '@willsoto/nestjs-prometheus';
 
 import { CardsService } from './cards.service';
 import { CardsController } from './cards.controller';
@@ -27,13 +26,7 @@ import { FilesModule } from '../files/files.module';
     }),
   ],
   controllers: [CardsController],
-  providers: [
-    CardsService,
-    makeCounterProvider({
-      name: 'get_cards_calls',
-      help: 'Total number of getCards calls',
-    }),
-  ],
+  providers: [CardsService],
   exports: [CardsService],
 })
 export class CardsModule {}
