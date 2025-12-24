@@ -12,9 +12,20 @@ import { Tag } from './entities/tag.entity';
 
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
+import { createRequestCounter } from '../metrics/metrics.provider';
 
 @Injectable()
 export class TagsService {
+  private createTagCounter = createRequestCounter(
+    'tags_create_total',
+    'Total number of created tags',
+  );
+
+  private findOneTagCounter = createRequestCounter(
+    'tags_find_one_total',
+    'Total number of find one tag',
+  );
+
   private readonly logger = new Logger('TagsService');
 
   constructor(
@@ -33,10 +44,12 @@ export class TagsService {
       }
 
       this.logger.log(`Creating a new tag ${createTagDto.name}`);
+      this.createTagCounter.inc({ success: 'true' });
           
       return this.tagRepository.save(createTagDto);
     } catch (error) {
       this.logger.error(`Create tag error ${error.message}`);
+      this.createTagCounter.inc({ success: 'false' });
 
       if (error instanceof BadRequestException) {
         throw error;
@@ -106,10 +119,12 @@ export class TagsService {
       }
 
       this.logger.log(`Find tag by id error ${id}`);
+      this.findOneTagCounter.inc({ success: 'true' });
 
       return tag;
     } catch (error) {
       this.logger.error(`Find tag by id error ${error.message}`);
+      this.findOneTagCounter.inc({ success: 'false' });
 
       if (error instanceof BadRequestException) {
         throw error;
