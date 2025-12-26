@@ -60,10 +60,9 @@ export class UsersService {
       const user = await this.userRepository.save(createUserDto);
       this.createUserCounter.inc({ success: 'true' });
 
-      return this.userRepository;
+      return user;
     } catch (error) {
       this.logger.error(error.message);
-
       this.createUserCounter.inc({ success: 'false' });
 
       if (error instanceof BadRequestException) {
@@ -90,6 +89,7 @@ export class UsersService {
       });
     } catch (error) {
       this.logger.error(error.message);
+
       throw new InternalServerErrorException(error.message);
     } finally {
       end();
@@ -120,6 +120,7 @@ export class UsersService {
       return user;
     } catch (error) {
       this.logger.error('findOne error');
+  
       throw error;
     } finally {
       end();
@@ -127,15 +128,21 @@ export class UsersService {
   }
 
   async findByAvatar(fileName: string) {
-    const user = await this.userRepository.findOne({
-      where: { avatar: fileName },
-    });
+    try {
+      const user = await this.userRepository.findOne({
+        where: { avatar: fileName },
+      });
 
-    if (!user) {
-      throw new NotFoundException(`user with avatar ${fileName} not found`);
+      if (!user) {
+        throw new NotFoundException(`user with avatar ${fileName} not found`);
+      }
+
+      return user;
+    } catch (error) {
+      this.logger.error(`findByAvatar error - fileName: ${fileName}`);
+  
+      throw error;
     }
-
-    return user;
   }
 
   async findByEmail(email: string) {
@@ -202,12 +209,15 @@ export class UsersService {
       });
     } catch (error) {
       this.logger.error('Update avatar error');
+
       throw error;
     }
   }
 
   async remove(id: number) {
     if (!Number.isInteger(id) || id <= 0) {
+      this.logger.warn(`Invalid user ID - with ID: ${id}`);
+
       throw new BadRequestException('Invalid user ID');
     }
 
@@ -219,19 +229,19 @@ export class UsersService {
       });
 
       if (!user) {
+        this.logger.warn(`User not found - with ID: ${id}`);
+
         throw new Error('User not found');
       }
 
-      this.logger.log(`Удаление пользователя с ID: ${id}`);
-      
       await this.userRepository.delete(id);
 
+      this.logger.log(`Delete user with ID: ${id}`);
       this.deleteUserCounter.inc({ success: 'true' });
 
       return { deleted: true };
     } catch (error) {
       this.logger.error(`Delete user with ID: ${id}`);
-      
       this.deleteUserCounter.inc({ success: 'false' });
 
       throw error;
