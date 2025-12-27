@@ -14,7 +14,7 @@ import { CreateLikeDto } from './dto/create-like.dto';
 
 @Injectable()
 export class LikesService {
-  private readonly logger = new Logger('UserService');
+  private readonly logger = new Logger(LikesService.name);
   
   constructor(
     @InjectRepository(Like)
