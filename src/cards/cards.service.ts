@@ -357,6 +357,8 @@ export class CardsService {
 
   async likeCard({ id }: { id: number }, user: User) {
     if (!Number.isInteger(id) || id <= 0) {
+      this.logger.warn(`Invalid card ID: (${id})`);
+      
       return new BadRequestException('Invalid card ID');
     }
 
@@ -378,6 +380,8 @@ export class CardsService {
       );
 
       if (!card) {
+        this.logger.warn(`Card not found - id: ${id}`);
+
         throw new NotFoundException('Card not found');
       }
 
@@ -395,6 +399,8 @@ export class CardsService {
 
   async dislikeCard({ id }: { id: number }, user: User) {
     if (!Number.isInteger(id) || id <= 0) {
+      this.logger.warn(`Invalid card ID: (${id})`);
+
       return new BadRequestException('Invalid card ID');
     }
 
@@ -416,6 +422,8 @@ export class CardsService {
       );
 
       if (!card) {
+        this.logger.warn(`Card not found - id: ${id}`);
+
         throw new NotFoundException('Card not found');
       }
 
