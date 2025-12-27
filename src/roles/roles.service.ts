@@ -21,7 +21,7 @@ import { UpdateRoleDto } from './dto/update-role.dto';
  */
 @Injectable()
 export class RolesService {
-  private readonly logger = new Logger('RolesService');
+  private readonly logger = new Logger(RolesService.name);
   /**
    * Constructor initializing repository dependency
    * @param roleRepository Repository for performing database operations on roles
