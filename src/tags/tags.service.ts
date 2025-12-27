@@ -26,7 +26,7 @@ export class TagsService {
     'Total number of find one tag',
   );
 
-  private readonly logger = new Logger('TagsService');
+  private readonly logger = new Logger(TagsService.name);
 
   constructor(
     @InjectRepository(Tag)
