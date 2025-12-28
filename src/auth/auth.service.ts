@@ -58,6 +58,7 @@ export class AuthService {
       this.logger.log(`User ${currentUser.id} successfully signed in`);
     } catch (error) {
       this.logger.error('Failed to sign in', error);
+
       throw new HttpException('Failed to sign in', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
