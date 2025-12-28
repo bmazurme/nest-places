@@ -101,7 +101,8 @@ export class UsersService {
 
     try {
       if (!Number.isInteger(id) || id <= 0) {
-        this.logger.error(`Invalid user ID - ${id}`);
+        this.logger.warn(`Invalid user ID - ${id}`);
+
         throw new BadRequestException('Invalid user ID');
       }
 
@@ -111,7 +112,8 @@ export class UsersService {
       });
 
       if (!user) {
-        this.logger.error(`user with id ${id} not found`);
+        this.logger.warn(`user with id ${id} not found`);
+
         throw new NotFoundException(`user with id ${id} not found`);
       }
 
@@ -134,6 +136,8 @@ export class UsersService {
       });
 
       if (!user) {
+        this.logger.warn(`user with avatar ${fileName} not found`);
+
         throw new NotFoundException(`user with avatar ${fileName} not found`);
       }
 
