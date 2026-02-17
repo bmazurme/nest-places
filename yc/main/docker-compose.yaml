@@ -146,6 +146,7 @@ services:
 
   ntlstl:
     image: cr.yandex/crpfap56bqr8nkph7d9g/ntlstl:latest
+    platform: linux/amd64
     ports:
       - 3505:3000
     networks:
