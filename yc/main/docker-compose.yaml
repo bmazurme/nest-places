@@ -144,6 +144,14 @@ services:
       - internet
     restart: unless-stopped
 
+ntlstl-frontend:
+    image: cr.yandex/crpfap56bqr8nkph7d9g/ntlstl:latest
+    ports:
+      - 3505:3000
+    networks:
+      - internet
+    restart: unless-stopped
+
 volumes:
   postgresdata:
     driver: local
