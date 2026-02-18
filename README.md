@@ -91,4 +91,5 @@ Nest is [MIT licensed](LICENSE).
 ![PM2](https://img.shields.io/badge/-PM2-black?style=flat-square&logo=pm2)
 ![Minio](https://img.shields.io/badge/-Minio-black?style=flat-square&logo=minio)
 ![Docker](https://img.shields.io/badge/-Docker-black?style=flat-square&logo=docker)
-
+![Jest](https://img.shields.io/badge/-Jest-black?style=flat-square&logo=jest)
+![Cypress](https://img.shields.io/badge/-Cypress-black?style=flat-square&logo=cypress)
