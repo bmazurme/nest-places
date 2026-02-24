@@ -70,7 +70,7 @@
     "@types/bcrypt": "^6.0.0",
     "@types/compression": "^1.8.1",
     "@types/cookie-parser": "^1.4.9",
-    "@types/express": "^5.0.3",
+    "@types/express": "^5.0.6",
     "@types/isomorphic-fetch": "^0.0.39",
     "@types/jest": "^30.0.0",
     "@types/multer": "^2.0.0",
