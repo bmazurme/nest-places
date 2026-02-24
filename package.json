@@ -66,7 +66,7 @@
     "@compodoc/compodoc": "^1.1.31",
     "@nestjs/cli": "^11.0.10",
     "@nestjs/schematics": "^11.0.9",
-    "@nestjs/testing": "^11.1.6",
+    "@nestjs/testing": "^11.1.14",
     "@types/bcrypt": "^6.0.0",
     "@types/compression": "^1.8.1",
     "@types/cookie-parser": "^1.4.10",
