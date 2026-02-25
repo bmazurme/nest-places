@@ -36,7 +36,7 @@ export class TagsService {
   async create(createTagDto: CreateTagDto) {
     try {
       const existingTag = await this.tagRepository.findOne({
-        where: { name: createTagDto.name }
+        where: { name: createTagDto.name },
       });
 
       if (existingTag) {
@@ -45,7 +45,7 @@ export class TagsService {
 
       this.logger.log(`Creating a new tag ${createTagDto.name}`);
       this.createTagCounter.inc({ success: 'true' });
-          
+
       return this.tagRepository.save(createTagDto);
     } catch (error) {
       this.logger.error(`Create tag error ${error.message}`);
@@ -75,7 +75,7 @@ export class TagsService {
       }
 
       const normalizedName = name.trim().toLowerCase();
-      
+
       const tag = await this.tagRepository.findOne({
         where: { name: normalizedName },
         select: {
@@ -142,7 +142,7 @@ export class TagsService {
 
       const existingTag = await this.tagRepository.findOne({
         where: { id },
-        select: { id: true, name: true }
+        select: { id: true, name: true },
       });
 
       if (!existingTag) {
@@ -152,7 +152,7 @@ export class TagsService {
       if (updateTagDto.name) {
         const existingByName = await this.tagRepository.findOne({
           where: { name: updateTagDto.name },
-          relations: ['posts']
+          relations: ['posts'],
         });
 
         if (existingByName && existingByName.id !== id) {
@@ -181,7 +181,7 @@ export class TagsService {
       }
 
       const existingTag = await this.tagRepository.findOne({
-        where: { id }
+        where: { id },
       });
 
       if (!existingTag) {
