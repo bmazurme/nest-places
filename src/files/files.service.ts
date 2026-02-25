@@ -81,7 +81,7 @@ export class FilesService {
 
       const processingTasks = [
         this.processImage(buffer, 564, this._bucketCovers, 'cover', filename),
-        this.processImage(buffer, 1000, this._bucketSlides, 'slide', filename)
+        this.processImage(buffer, 1000, this._bucketSlides, 'slide', filename),
       ];
 
       await Promise.all(processingTasks);
@@ -90,9 +90,7 @@ export class FilesService {
     } catch (error) {
       this.logger.error(`Error while processing image: ${error.message}`);
 
-      throw new InternalServerErrorException(
-        'Error while processing image',
-      );
+      throw new InternalServerErrorException('Error while processing image');
     }
   }
 
@@ -129,7 +127,6 @@ export class FilesService {
         'Failed to remove file. Please try again later.',
       );
     }
-
   }
 
   async getAvatarFile(filename: string, response: Response) {
@@ -285,7 +282,7 @@ export class FilesService {
       );
 
       await this.usersService.updateAvatar(current);
-      await this.minioService.removeObject(this._bucketAvatars, currentAvatar)
+      await this.minioService.removeObject(this._bucketAvatars, currentAvatar);
 
       return current;
     } catch (error) {
@@ -319,13 +316,12 @@ export class FilesService {
       return {
         buffer: processed,
         size: processed.length,
-        format: 'webp'
+        format: 'webp',
       };
     } catch (error) {
-      this.logger.error(
-        `Error processing ${type} image: ${error.message}`,
-        { error }
-      );
+      this.logger.error(`Error processing ${type} image: ${error.message}`, {
+        error,
+      });
 
       throw error;
     }

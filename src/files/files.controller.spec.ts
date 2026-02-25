@@ -76,10 +76,10 @@ describe('FilesController', () => {
         mimetype: 'image/jpeg',
         buffer: Buffer.from('file-content'),
         size: 100,
-        stream: new Readable,
+        stream: new Readable(),
         destination: '',
         filename: '',
-        path: ''
+        path: '',
       };
 
       await controller.uploadFile(mockFile);
@@ -95,7 +95,10 @@ describe('FilesController', () => {
 
       await controller.getAvatarFile(filename, mockResponse);
 
-      expect(filesService.getAvatarFile).toHaveBeenCalledWith(filename, mockResponse);
+      expect(filesService.getAvatarFile).toHaveBeenCalledWith(
+        filename,
+        mockResponse,
+      );
       expect(filesService.getAvatarFile).toHaveBeenCalledTimes(1);
     });
   });
@@ -106,7 +109,10 @@ describe('FilesController', () => {
 
       await controller.getCoverFile(coverName, mockResponse);
 
-      expect(filesService.getCover).toHaveBeenCalledWith(coverName, mockResponse);
+      expect(filesService.getCover).toHaveBeenCalledWith(
+        coverName,
+        mockResponse,
+      );
       expect(filesService.getCover).toHaveBeenCalledTimes(1);
     });
   });
@@ -129,7 +135,10 @@ describe('FilesController', () => {
 
       await controller.getFile(filename, mockResponse);
 
-      expect(filesService.getSlide).toHaveBeenCalledWith(filename, mockResponse);
+      expect(filesService.getSlide).toHaveBeenCalledWith(
+        filename,
+        mockResponse,
+      );
       expect(filesService.getSlide).toHaveBeenCalledTimes(1);
     });
   });
@@ -143,17 +152,20 @@ describe('FilesController', () => {
         mimetype: 'image/jpeg',
         buffer: Buffer.from('avatar-content'),
         size: 200,
-        stream: new Readable,
+        stream: new Readable(),
         destination: '',
         filename: '',
-        path: ''
+        path: '',
       };
 
       const req = { user: mockUser };
 
       await controller.updateAvatar(mockFile, req);
 
-      expect(filesService.updateAvatar).toHaveBeenCalledWith(mockFile, mockUser);
+      expect(filesService.updateAvatar).toHaveBeenCalledWith(
+        mockFile,
+        mockUser,
+      );
       expect(filesService.updateAvatar).toHaveBeenCalledTimes(1);
     });
   });
