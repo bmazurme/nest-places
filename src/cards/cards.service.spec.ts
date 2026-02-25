@@ -1,8 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { BadRequestException, InternalServerErrorException } from '@nestjs/common';
-
+// import { Repository } from 'typeorm';
+import {
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import promClient from 'prom-client';
 
 import { CardsService } from './cards.service';
 import { LikesService } from '../likes/likes.service';
@@ -12,7 +15,6 @@ import { FilesService } from '../files/files.service';
 import { Card } from './entities/card.entity';
 import { User } from '../users/entities/user.entity';
 import { CreateCardDto } from './dto/create-card.dto';
-
 
 const mockCounter = {
   inc: jest.fn(),
@@ -64,9 +66,12 @@ const mockFilesService = {
 
 describe('CardsService', () => {
   let service: CardsService;
-  let cardRepository: Repository<Card>;
+  // let cardRepository: Repository<Card>;
 
   beforeEach(async () => {
+    // const promClient = require('prom-client');
+    promClient.register.clear();
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CardsService,
@@ -87,17 +92,14 @@ describe('CardsService', () => {
           useValue: mockFilesService,
         },
         {
-          provide: 'PROM_METRIC_GET_CARDS_CALLS',
-          useValue: {
-            inc: jest.fn(),
-          },
+          provide: 'cards_get_total',
+          useValue: mockCounter,
         },
       ],
     }).compile();
 
     service = module.get<CardsService>(CardsService);
-    cardRepository = module.get<Repository<Card>>(getRepositoryToken(Card));
-
+    // cardRepository = module.get<Repository<Card>>(getRepositoryToken(Card));
 
     jest.clearAllMocks();
   });
@@ -108,25 +110,27 @@ describe('CardsService', () => {
         name: 'New Card',
         link: 'image.jpg',
         tagName: 'test',
-        user: new User
+        user: new User(),
       };
 
       mockTagsService.findByNameOrCreate.mockResolvedValue({ id: 1 });
       mockFilesService.resizeAndCopyImage.mockResolvedValue(undefined);
       mockCardRepository.save.mockResolvedValue(mockCard);
 
-
       const result = await service.create(createCardDto, mockUser);
 
-
       expect(mockTagsService.findByNameOrCreate).toHaveBeenCalledWith('test');
-      expect(mockFilesService.resizeAndCopyImage).toHaveBeenCalledWith('image.jpg');
+      expect(mockFilesService.resizeAndCopyImage).toHaveBeenCalledWith(
+        'image.jpg',
+      );
       expect(mockCardRepository.save).toHaveBeenCalled();
       expect(result).toEqual(mockCard);
     });
 
     it('should throw BadRequestException for invalid card data', async () => {
-      await expect(service.create(null, mockUser)).rejects.toThrow(BadRequestException);
+      await expect(service.create(null, mockUser)).rejects.toThrow(
+        BadRequestException,
+      );
       await expect(
         service.create({ name: '', link: '' } as CreateCardDto, mockUser),
       ).rejects.toThrow(BadRequestException);
@@ -137,17 +141,21 @@ describe('CardsService', () => {
         name: 'Card with bad image',
         link: 'broken.jpg',
         tagName: 'test',
-        user: new User
+        user: new User(),
       };
 
       mockTagsService.findByNameOrCreate.mockResolvedValue({ id: 1 });
-      mockFilesService.resizeAndCopyImage.mockRejectedValue(new Error('Image processing failed'));
+      mockFilesService.resizeAndCopyImage.mockRejectedValue(
+        new Error('Image processing failed'),
+      );
 
-      await expect(service.create(createCardDto, mockUser))
-        .rejects
-        .toThrow(BadRequestException);
+      await expect(service.create(createCardDto, mockUser)).rejects.toThrow(
+        BadRequestException,
+      );
 
-      expect(mockFilesService.resizeAndCopyImage).toHaveBeenCalledWith('broken.jpg');
+      expect(mockFilesService.resizeAndCopyImage).toHaveBeenCalledWith(
+        'broken.jpg',
+      );
     });
 
     it('should throw InternalServerErrorException if DB save fails', async () => {
@@ -155,16 +163,16 @@ describe('CardsService', () => {
         name: 'Card with DB error',
         link: 'image.jpg',
         tagName: 'test',
-        user: new User
+        user: new User(),
       };
 
       mockTagsService.findByNameOrCreate.mockResolvedValue({ id: 1 });
       mockFilesService.resizeAndCopyImage.mockResolvedValue(undefined);
       mockCardRepository.save.mockRejectedValue(new Error('DB save failed'));
 
-      await expect(service.create(createCardDto, mockUser))
-        .rejects
-        .toThrow(InternalServerErrorException);
+      await expect(service.create(createCardDto, mockUser)).rejects.toThrow(
+        InternalServerErrorException,
+      );
     });
   });
 });

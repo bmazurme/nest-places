@@ -28,7 +28,7 @@ export class CardsService {
     'cards_get_total',
     'Total number of created cards',
   );
-  
+
   constructor(
     @InjectRepository(Card)
     private readonly cardRepository: Repository<Card>,
@@ -59,25 +59,28 @@ export class CardsService {
 
       try {
         await this.filesService.resizeAndCopyImage(createCardDto.link);
-      } catch (fileError) {
+      } catch {
+        //(fileError) {
+        // console.log(fileError);
         throw new BadRequestException('Failed to process image file');
       }
 
       const savedCard = await this.cardRepository.save(card);
-      const cardWithUser = await this.cardRepository.createQueryBuilder('card')
+      const cardWithUser = await this.cardRepository
+        .createQueryBuilder('card')
         .select([
           'card.id as id',
           'card.name as name',
           'card.link as link',
           //  'tag.name as tagName', // Получаем имена тегов
           'user.id as userid',
-          'user.name as username'
+          'user.name as username',
         ])
         .leftJoin('card.user', 'user')
         .leftJoin('card.tags', 'tag')
         .where('card.id = :id', { id: savedCard.id })
         .getRawOne();
-      
+
       return cardWithUser;
     } catch (error) {
       this.logger.error(`Card create error ${error.message}`);
@@ -95,14 +98,14 @@ export class CardsService {
       return await this.cardRepository.find({
         relations: ['tags'],
         order: {
-          createdAt: 'DESC' // Сортировка по дате создания
+          createdAt: 'DESC', // Сортировка по дате создания
         },
       });
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
       }
-    
+
       throw new InternalServerErrorException('Failed to fetch cards');
     }
   }
@@ -244,10 +247,10 @@ export class CardsService {
     if (!tagName || typeof tagName !== 'string') {
       throw new BadRequestException('Invalid tag name');
     }
-    
+
     if (!Number.isInteger(page) || page <= 0) {
       this.logger.error(`Invalid page number ${page}`);
-      
+
       throw new BadRequestException('Invalid page number');
     }
 
@@ -288,7 +291,7 @@ export class CardsService {
 
   async getCardsByPage(page: number = 0, currentUser: number) {
     this.getCardsCounter.inc({ success: 'true' });
-    
+
     const PAGE_SIZE = 3;
 
     try {
@@ -321,7 +324,7 @@ export class CardsService {
     if (!Number.isInteger(cardId) || cardId <= 0) {
       throw new BadRequestException('Invalid card ID');
     }
-    
+
     if (!Number.isInteger(userId) || userId <= 0) {
       throw new BadRequestException('Invalid user ID');
     }
@@ -358,7 +361,7 @@ export class CardsService {
   async likeCard({ id }: { id: number }, user: User) {
     if (!Number.isInteger(id) || id <= 0) {
       this.logger.warn(`Invalid card ID: (${id})`);
-      
+
       return new BadRequestException('Invalid card ID');
     }
 

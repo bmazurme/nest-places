@@ -45,7 +45,7 @@ const mockUser: User = {
 describe('CardsController', () => {
   let controller: CardsController;
   let cardsService: CardsService;
-  let likesService: LikesService;
+  // let likesService: LikesService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -80,17 +80,20 @@ describe('CardsController', () => {
 
     controller = module.get<CardsController>(CardsController);
     cardsService = module.get<CardsService>(CardsService);
-    likesService = module.get<LikesService>(LikesService);
+    // likesService = module.get<LikesService>(LikesService);
 
     jest.clearAllMocks();
   });
 
   describe('create', () => {
     it('should call cardsService.create with correct params', async () => {
-      const createCardDto = { title: 'Test Card', content: 'Test Content' } as unknown as CreateCardDto;
-      
+      const createCardDto = {
+        title: 'Test Card',
+        content: 'Test Content',
+      } as unknown as CreateCardDto;
+
       await controller.create(createCardDto, mockUser);
-      
+
       expect(cardsService.create).toHaveBeenCalledWith(createCardDto, mockUser);
       expect(cardsService.create).toHaveBeenCalledTimes(1);
     });
@@ -107,9 +110,9 @@ describe('CardsController', () => {
     it('should call cardsService.update with correct params', async () => {
       const id = '1';
       const updateCardDto = { title: 'Updated Title' } as UpdateCardDto;
-      
+
       await controller.update(id, updateCardDto);
-      
+
       expect(cardsService.update).toHaveBeenCalledWith(1, updateCardDto);
       expect(cardsService.update).toHaveBeenCalledTimes(1);
     });
@@ -118,9 +121,9 @@ describe('CardsController', () => {
   describe('like', () => {
     it('should call cardsService.likeCard with correct params', async () => {
       const id = '1';
-      
+
       await controller.like(id, mockUser);
-      
+
       expect(cardsService.likeCard).toHaveBeenCalledWith({ id: 1 }, mockUser);
       expect(cardsService.likeCard).toHaveBeenCalledTimes(1);
     });
@@ -129,10 +132,13 @@ describe('CardsController', () => {
   describe('dislike', () => {
     it('should call cardsService.dislikeCard with correct params', async () => {
       const id = '1';
-      
+
       await controller.dislike(id, mockUser);
-      
-      expect(cardsService.dislikeCard).toHaveBeenCalledWith({ id: 1 }, mockUser);
+
+      expect(cardsService.dislikeCard).toHaveBeenCalledWith(
+        { id: 1 },
+        mockUser,
+      );
       expect(cardsService.dislikeCard).toHaveBeenCalledTimes(1);
     });
   });
@@ -140,9 +146,9 @@ describe('CardsController', () => {
   describe('remove', () => {
     it('should call cardsService.remove with correct params', async () => {
       const id = '1';
-      
+
       await controller.remove(id, mockUser);
-      
+
       expect(cardsService.remove).toHaveBeenCalledWith(1, mockUser);
       expect(cardsService.remove).toHaveBeenCalledTimes(1);
     });
@@ -151,9 +157,9 @@ describe('CardsController', () => {
   describe('getCount', () => {
     it('should call cardsService.getCount with correct param', async () => {
       const id = '1';
-      
+
       await controller.getCount(id);
-      
+
       expect(cardsService.getCount).toHaveBeenCalledWith(1);
       expect(cardsService.getCount).toHaveBeenCalledTimes(1);
     });
@@ -164,9 +170,9 @@ describe('CardsController', () => {
       const userId = '1';
       const page = '2';
       const req = { user: mockUser };
-      
+
       await controller.getCardsByUser(userId, page, req);
-      
+
       expect(cardsService.getCardsByUser).toHaveBeenCalledWith(1, 2, mockUser);
       expect(cardsService.getCardsByUser).toHaveBeenCalledTimes(1);
     });
@@ -177,10 +183,14 @@ describe('CardsController', () => {
       const tagName = 'test-tag';
       const page = '3';
       const req = { user: mockUser };
-      
+
       await controller.getCardsByTag(tagName, page, req);
-      
-      expect(cardsService.getCardsByTag).toHaveBeenCalledWith(tagName, 3, mockUser);
+
+      expect(cardsService.getCardsByTag).toHaveBeenCalledWith(
+        tagName,
+        3,
+        mockUser,
+      );
       expect(cardsService.getCardsByTag).toHaveBeenCalledTimes(1);
     });
   });
@@ -189,9 +199,9 @@ describe('CardsController', () => {
     it('should call cardsService.getCardsByPage with correct params', async () => {
       const page = '4';
       const req = { userId: 1 };
-      
+
       await controller.getCardsByPage(page, req);
-      
+
       expect(cardsService.getCardsByPage).toHaveBeenCalledWith(4, 1);
       expect(cardsService.getCardsByPage).toHaveBeenCalledTimes(1);
     });
@@ -200,9 +210,9 @@ describe('CardsController', () => {
   describe('findOne', () => {
     it('should call cardsService.getCardById with correct params', async () => {
       const id = '5';
-      
+
       await controller.findOne(id, mockUser);
-      
+
       expect(cardsService.getCardById).toHaveBeenCalledWith(5, mockUser.id);
       expect(cardsService.getCardById).toHaveBeenCalledTimes(1);
     });
