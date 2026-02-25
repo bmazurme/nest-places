@@ -16,7 +16,7 @@ import { User } from '../users/entities/user.entity';
 @Injectable()
 export class OAuthService {
   private readonly logger = new Logger(OAuthService.name);
-  
+
   constructor(
     private readonly usersService: UsersService,
     private readonly authService: AuthService,
