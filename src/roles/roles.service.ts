@@ -169,7 +169,7 @@ export class RolesService {
 
       if (role.users.length > 0) {
         throw new ForbiddenException(
-          'The role cannot be deleted because it is associated with users'
+          'The role cannot be deleted because it is associated with users',
         );
       }
 
