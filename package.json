@@ -25,7 +25,6 @@
     "whatwg-encoding": "^3.1.1",
     "uuidv4": "^13.0.0",
     "minimatch": "10.2.2",
-    "ajv": "8.18.0",
     "fast-xml-parser": "5.3.7"
   },
   "dependencies": {
@@ -84,9 +83,9 @@
     "@types/supertest": "^6.0.3",
     "@typescript-eslint/eslint-plugin": "^8.56.1",
     "@typescript-eslint/parser": "^8.56.1",
-    "eslint": "^10.0.2",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.5",
+    "eslint": "^8.42.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
     "jest": "^30.2.0",
     "prettier": "^3.8.1",
     "supertest": "^7.2.2",
