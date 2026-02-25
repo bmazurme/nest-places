@@ -7,7 +7,6 @@ import {
   Res,
   HttpCode,
   HttpStatus,
-  Req,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -26,7 +25,7 @@ export class AuthController {
   @Post('/logout')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Logout user' })
-    @ApiResponse({
+  @ApiResponse({
     status: 200,
     description: 'User successfully logged out',
   })
