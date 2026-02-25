@@ -49,7 +49,7 @@ export class UsersService {
     const { email } = createUserDto;
 
     const end = this.findUserHistogram.startTimer({ operation: 'create' });
-    
+
     try {
       const existUsers = await this.findByEmail(email);
 
@@ -122,7 +122,7 @@ export class UsersService {
       return user;
     } catch (error) {
       this.logger.error('findOne error');
-  
+
       throw error;
     } finally {
       end();
@@ -144,7 +144,7 @@ export class UsersService {
       return user;
     } catch (error) {
       this.logger.error(`findByAvatar error - fileName: ${fileName}`);
-  
+
       throw error;
     }
   }
@@ -178,7 +178,7 @@ export class UsersService {
         name: updateUserDto.name,
         about: updateUserDto.about,
       });
-      
+
       this.updateUserCounter.inc({ success: 'true' });
 
       return {

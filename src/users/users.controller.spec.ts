@@ -28,7 +28,7 @@ const mockUser: User = {
 describe('UsersController', () => {
   let controller: UsersController;
   let usersService: UsersService;
-  let reflector: Reflector;
+  // let reflector: Reflector;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -56,14 +56,17 @@ describe('UsersController', () => {
 
     controller = module.get<UsersController>(UsersController);
     usersService = module.get<UsersService>(UsersService);
-    reflector = module.get<Reflector>(Reflector);
+    // reflector = module.get<Reflector>(Reflector);
 
     jest.clearAllMocks();
   });
 
   describe('create', () => {
     it('should call usersService.create with correct params', async () => {
-      const createUserDto = { email: 'new@example.com', password: 'newpass' } as CreateUserDto;
+      const createUserDto = {
+        email: 'new@example.com',
+        password: 'newpass',
+      } as CreateUserDto;
 
       await controller.create(createUserDto);
 
@@ -124,7 +127,7 @@ describe('UsersController', () => {
   // describe('remove', () => {
   //   it('should have Roles decorator with Admin role', () => {
   //     const roles = reflector.getAll<string[]>(
-  //       'roles', 
+  //       'roles',
   //       UsersController.prototype.remove
   //     );
 
