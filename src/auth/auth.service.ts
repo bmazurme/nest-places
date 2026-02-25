@@ -32,7 +32,10 @@ export class AuthService {
     } catch (error) {
       this.logger.error('Failed to logout', error);
 
-      throw new HttpException('Failed to logout', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Failed to logout',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -48,9 +51,9 @@ export class AuthService {
       response.cookie('access_token', this.jwtService.sign(payload), {
         httpOnly: true,
         maxAge: 3600000,
-        secure: true,  // Только для HTTPS
+        secure: true, // Только для HTTPS
         sameSite: 'none', // Для междоменных запросов
-        domain: '.ntlstl.dev',  // Общий домен для всех поддоменов
+        domain: '.ntlstl.dev', // Общий домен для всех поддоменов
       });
 
       response.redirect(this.getTargetUrl());
@@ -59,7 +62,10 @@ export class AuthService {
     } catch (error) {
       this.logger.error('Failed to sign in', error);
 
-      throw new HttpException('Failed to sign in', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Failed to sign in',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }
