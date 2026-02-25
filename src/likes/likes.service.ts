@@ -15,7 +15,7 @@ import { CreateLikeDto } from './dto/create-like.dto';
 @Injectable()
 export class LikesService {
   private readonly logger = new Logger(LikesService.name);
-  
+
   constructor(
     @InjectRepository(Like)
     private readonly likeRepository: Repository<Like>,
@@ -64,7 +64,9 @@ export class LikesService {
         throw new NotFoundException('like not found');
       }
 
-      this.logger.log(`Removing a like for the card ${createLikeDto.card.id} by user ${createLikeDto.user.id}`);
+      this.logger.log(
+        `Removing a like for the card ${createLikeDto.card.id} by user ${createLikeDto.user.id}`,
+      );
 
       return await this.likeRepository.delete(like.id);
     } catch (error) {
