@@ -173,4 +173,3 @@ networks:
     internal: true
   internet:
     driver: bridge
-
