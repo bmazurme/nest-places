@@ -29,10 +29,11 @@ export class CustomJwtGuard implements CanActivate {
       request.userId = decoded.sub;
       this.logger.log(`User id ${decoded.sub} from decoded.sub`);
     } catch (e) {
+      console.log(e);
       // Игнорируем ошибку, оставляя userId = -1
     }
     // }
-    
+
     // Всегда разрешаем доступ
     return true;
   }
