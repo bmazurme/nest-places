@@ -155,6 +155,31 @@ services:
       - NODE_ENV=production
     restart: unless-stopped
 
+
+  notes-core:
+    image: cr.yandex/crpfap56bqr8nkph7d9g/notes-core:latest
+    container_name: notes-core
+    networks:
+      - internet
+    env_file:
+      - /data/.env
+    ports:
+      - 3450:3000
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  notes-client:
+    image: cr.yandex/crpfap56bqr8nkph7d9g/notes-client:latest
+    ports:
+      - 3455:80
+    depends_on:
+      - notes-client
+    networks:
+      - internet
+    restart: unless-stopped
+
+
 volumes:
   postgresdata:
     driver: local
