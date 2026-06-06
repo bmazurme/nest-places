@@ -170,15 +170,15 @@ services:
     restart: unless-stopped
 
 
-  # notes-client:
-  #   image: cr.yandex/crpfap56bqr8nkph7d9g/notes-client:latest
-  #   ports:
-  #     - 3455:80
-  #   depends_on:
-  #     - notes-client
-  #   networks:
-  #     - internet
-  #   restart: unless-stopped
+  notes-client:
+    image: cr.yandex/crpfap56bqr8nkph7d9g/notes-client:latest
+    ports:
+      - 3455:80
+    depends_on:
+      - notes-client
+    networks:
+      - internet
+    restart: unless-stopped
 
 
 volumes:
