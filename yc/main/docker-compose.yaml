@@ -156,7 +156,6 @@ services:
     restart: unless-stopped
 
 
-
   notes-core:
     image: cr.yandex/crpfap56bqr8nkph7d9g/notes-core:latest
     container_name: notes-core
