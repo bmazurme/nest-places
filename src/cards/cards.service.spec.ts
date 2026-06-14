@@ -44,6 +44,7 @@ const mockCardRepository = {
   query: jest.fn(),
   createQueryBuilder: jest.fn().mockReturnValue({
     select: jest.fn().mockReturnThis(),
+    addSelect: jest.fn().mockReturnThis(),
     leftJoin: jest.fn().mockReturnThis(),
     where: jest.fn().mockReturnThis(),
     getRawOne: jest.fn().mockResolvedValue(mockCard),
