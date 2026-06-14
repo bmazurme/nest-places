@@ -65,6 +65,12 @@ export class User extends BaseEntity {
   @OneToMany(() => Like, (like) => like.user)
   likes: User;
 
+  /**
+   * Number of cards created by the user
+   * @description Virtual field populated via loadRelationCountAndMap, not persisted in the database
+   */
+  count?: number;
+
   async updateRoles(newRoles: Role[], manager: EntityManager): Promise<void> {
     try {
       this.roles = [];

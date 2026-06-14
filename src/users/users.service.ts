@@ -79,14 +79,13 @@ export class UsersService {
     const end = this.findUserHistogram.startTimer({ operation: 'findAll' });
 
     try {
-      return await this.userRepository.find({
-        select: {
-          id: true,
-          name: true,
-          about: true,
-          avatar: true,
-        },
-      });
+      const users = await this.userRepository
+        .createQueryBuilder('user')
+        .select(['user.id', 'user.name', 'user.about', 'user.avatar'])
+        .loadRelationCountAndMap('user.count', 'user.cards')
+        .getMany();
+
+      return users.sort((a, b) => (b.count ?? 0) - (a.count ?? 0));
     } catch (error) {
       this.logger.error(error.message);
 
