@@ -51,6 +51,14 @@ export class TagsController {
     return this.tagsService.findOne(+id);
   }
 
+  @ApiOperation({
+    summary: 'Get count of unique tags used by user',
+  })
+  @Get('count/:id')
+  getCount(@Param('id') id: string) {
+    return this.tagsService.getCount(+id);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateTagDto: UpdateTagDto) {
     return this.tagsService.update(+id, updateTagDto);

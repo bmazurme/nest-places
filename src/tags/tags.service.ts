@@ -59,13 +59,19 @@ export class TagsService {
     }
   }
 
-  findAll() {
-    return this.tagRepository.find({
-      select: {
-        id: true,
-        name: true,
-      },
-    });
+  async findAll() {
+    const tags = await this.tagRepository
+      .createQueryBuilder('tag')
+      .leftJoin('cardTags', 'ct', 'ct."tagId" = tag.id')
+      .select('tag.id', 'id')
+      .addSelect('tag.name', 'name')
+      .addSelect('COUNT(ct."cardId")::int', 'count')
+      .groupBy('tag.id')
+      .addGroupBy('tag.name')
+      .orderBy('count', 'DESC')
+      .getRawMany();
+
+    return tags;
   }
 
   async findByNameOrCreate(name: string) {
@@ -171,6 +177,29 @@ export class TagsService {
       }
 
       throw new InternalServerErrorException('Update tag error');
+    }
+  }
+
+  async getCount(userId: number) {
+    if (!Number.isInteger(userId) || userId <= 0) {
+      throw new BadRequestException('Invalid user ID');
+    }
+
+    try {
+      const { count } = await this.tagRepository
+        .createQueryBuilder('tag')
+        .innerJoin('tag.cards', 'card')
+        .where('card.userId = :userId', { userId })
+        .select('COUNT(DISTINCT tag.id)', 'count')
+        .getRawOne();
+
+      return { count: +count };
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException('Failed to get tag count');
     }
   }
 
