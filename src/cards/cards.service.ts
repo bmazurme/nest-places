@@ -219,8 +219,12 @@ export class CardsService {
 
       return this.cardRepository.query(
         `
-          SELECT t.id, t.name, t.link, t."userId" "userid", t.count::int, t.isliked, u.name userName
-          FROM (SELECT c.id, c.name, c.link, c."userId", COUNT(l."cardId") as count, bool_or(l."userId" = $2) as isliked
+          SELECT t.id, t.name, t.link, t."userId" "userid", t.count::int, t.isliked, u.name userName, t.tags
+          FROM (SELECT c.id, c.name, c.link, c."userId", COUNT(l."cardId") as count, bool_or(l."userId" = $2) as isliked,
+                  COALESCE(
+                    (SELECT json_agg(tag.name) FROM "cardTags" ct LEFT JOIN "tag" ON ct."tagId" = tag.id WHERE ct."cardId" = c.id),
+                    '[]'
+                  ) as tags
               FROM card c
               LEFT JOIN "like" l ON c.id = l."cardId"
               WHERE c."userId" = $1
@@ -263,10 +267,14 @@ export class CardsService {
 
       return this.cardRepository.query(
         `
-          SELECT rslt.id, rslt.name, rslt.link, rslt."userId" userid, rslt.count::int, rslt.liked isliked, rslt.userName, rslt.tagsname tagsname
-          FROM (SELECT tt.id, tt.name, tt.link, tt."userId", tt.count::int, tt.liked, tt.userName, tt.tagid, tag.name tagsname
-              FROM (SELECT t.id, t.name, t.link, t."userId", t.count::int, t.liked, u.name userName, tg."tagId" tagid
-                  FROM (SELECT c.id, c.name, c.link, c."userId", COUNT(l."cardId") as count, bool_or(l."userId" = $2) as liked
+          SELECT rslt.id, rslt.name, rslt.link, rslt."userId" userid, rslt.count::int, rslt.liked isliked, rslt.userName, rslt.tagsname tagsname, rslt.tags
+          FROM (SELECT tt.id, tt.name, tt.link, tt."userId", tt.count::int, tt.liked, tt.userName, tt.tagid, tt.tags, tag.name tagsname
+              FROM (SELECT t.id, t.name, t.link, t."userId", t.count::int, t.liked, u.name userName, tg."tagId" tagid, t.tags
+                  FROM (SELECT c.id, c.name, c.link, c."userId", COUNT(l."cardId") as count, bool_or(l."userId" = $2) as liked,
+                          COALESCE(
+                            (SELECT json_agg(tag.name) FROM "cardTags" ct LEFT JOIN "tag" ON ct."tagId" = tag.id WHERE ct."cardId" = c.id),
+                            '[]'
+                          ) as tags
                       FROM card c
                       LEFT JOIN "like" l ON c.id = l."cardId"
                       GROUP BY c.id) t
@@ -299,8 +307,12 @@ export class CardsService {
 
       return this.cardRepository.query(
         `
-          SELECT t.id, t.name, t.link, t."userId" "userId", t.count::int, t.isLiked, u.name userName
-          FROM (SELECT c.id, c.name, c.link, c."userId", COUNT(l."cardId") as count, bool_or(l."userId" = $1) as isLiked
+          SELECT t.id, t.name, t.link, t."userId" "userId", t.count::int, t.isLiked, u.name userName, t.tags
+          FROM (SELECT c.id, c.name, c.link, c."userId", COUNT(l."cardId") as count, bool_or(l."userId" = $1) as isLiked,
+                  COALESCE(
+                    (SELECT json_agg(tag.name) FROM "cardTags" ct LEFT JOIN "tag" ON ct."tagId" = tag.id WHERE ct."cardId" = c.id),
+                    '[]'
+                  ) as tags
               FROM card c
               LEFT JOIN "like" l ON c.id = l."cardId"
               GROUP BY c.id) t
