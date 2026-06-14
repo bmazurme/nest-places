@@ -1,9 +1,18 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
-import { Response } from 'express';
+import { CookieOptions, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 
 import { User } from '../users/entities/user.entity';
+import { UsersService } from '../users/users.service';
+import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { CheckAuthResponseDto } from './dto/check-auth.response.dto';
+import { AuthRequest } from './types/auth-request.type';
+
+const ACCESS_TOKEN_EXPIRES_IN = '15m';
+const ACCESS_TOKEN_MAX_AGE = 15 * 60 * 1000;
+const REFRESH_TOKEN_EXPIRES_IN = '7d';
+const REFRESH_TOKEN_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
 
 @Injectable()
 export class AuthService {
@@ -11,50 +20,71 @@ export class AuthService {
 
   constructor(
     private readonly jwtService: JwtService,
-    private configService: ConfigService,
+    private readonly usersService: UsersService,
+    private readonly configService: ConfigService,
   ) {}
+
   getTargetUrl() {
     return this.configService.get<string>('TARGET_URL');
   }
 
-  async logout(response: Response, user: User) {
-    try {
-      response.clearCookie('access_token', {
-        httpOnly: true,
-        secure: true,
-        // secure: process.env.NODE_ENV === 'production',
-        sameSite: 'none', // sameSite: 'strict',
-        maxAge: 0,
-        domain: '.ntlstl.dev',
-      });
+  private getAccessTokenCookieOptions(): CookieOptions {
+    return {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: ACCESS_TOKEN_MAX_AGE,
+    };
+  }
 
-      this.logger.log(`User ${user.id} successfully logged out`);
-    } catch (error) {
-      this.logger.error('Failed to logout', error);
+  private getRefreshTokenCookieOptions(): CookieOptions {
+    return {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: REFRESH_TOKEN_MAX_AGE,
+    };
+  }
 
-      throw new HttpException(
-        'Failed to logout',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+  private buildPayload(user: User): JwtPayload {
+    return {
+      sub: user.id,
+      roles: (user as User & { roles: { name: string }[] }).roles.map(
+        ({ name }) => name,
+      ),
+    };
+  }
+
+  private generateTokens(user: User) {
+    const payload = this.buildPayload(user);
+
+    const accessToken = this.jwtService.sign(payload, {
+      expiresIn: ACCESS_TOKEN_EXPIRES_IN,
+    });
+    const refreshToken = this.jwtService.sign(payload, {
+      secret: this.configService.get<string>('REFRESH_JWT_SECRET'),
+      expiresIn: REFRESH_TOKEN_EXPIRES_IN,
+    });
+
+    return { accessToken, refreshToken };
   }
 
   async signin(currentUser: User, response: Response) {
     try {
-      const payload = {
-        sub: currentUser.id,
-        roles: (currentUser as User & { roles: string[] }).roles.map(
-          ({ name }) => name,
-        ),
-      };
+      const { accessToken, refreshToken } = this.generateTokens(currentUser);
 
-      response.cookie('access_token', this.jwtService.sign(payload), {
-        httpOnly: true,
-        maxAge: 3600000,
-        secure: true, // Только для HTTPS
-        sameSite: 'none', // Для междоменных запросов
-        domain: '.ntlstl.dev', // Общий домен для всех поддоменов
-      });
+      await this.usersService.saveRefreshToken(currentUser.id, refreshToken);
+
+      response.cookie(
+        'access_token',
+        accessToken,
+        this.getAccessTokenCookieOptions(),
+      );
+      response.cookie(
+        'refresh_token',
+        refreshToken,
+        this.getRefreshTokenCookieOptions(),
+      );
 
       response.redirect(this.getTargetUrl());
 
@@ -67,5 +97,93 @@ export class AuthService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  async logout(request: AuthRequest, response: Response) {
+    try {
+      const refreshToken = request.cookies?.refresh_token;
+
+      if (refreshToken) {
+        const user = await this.usersService.findByRefreshToken(refreshToken);
+
+        if (user) {
+          await this.usersService.saveRefreshToken(user.id, null);
+        }
+      }
+
+      response.clearCookie('access_token', this.getAccessTokenCookieOptions());
+      response.clearCookie(
+        'refresh_token',
+        this.getRefreshTokenCookieOptions(),
+      );
+
+      this.logger.log('User successfully logged out');
+
+      return { message: 'Successfully logged out' };
+    } catch (error) {
+      this.logger.error('Failed to logout', error);
+
+      throw new HttpException(
+        'Failed to logout',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async checkAuth(
+    request: AuthRequest,
+    response: Response,
+  ): Promise<CheckAuthResponseDto> {
+    const refreshToken = request.cookies?.refresh_token;
+
+    if (!refreshToken) {
+      return { isAuthenticated: false };
+    }
+
+    const user = await this.usersService.findByRefreshToken(refreshToken);
+
+    if (!user) {
+      return { isAuthenticated: false };
+    }
+
+    const { accessToken } = this.generateTokens(user);
+
+    response.cookie(
+      'access_token',
+      accessToken,
+      this.getAccessTokenCookieOptions(),
+    );
+
+    return { isAuthenticated: true, accessToken };
+  }
+
+  async refreshTokens(request: AuthRequest, response: Response) {
+    const refreshToken = request.cookies?.refresh_token;
+
+    const user = await this.usersService.findByRefreshToken(
+      refreshToken as string,
+    );
+
+    if (!user) {
+      throw new HttpException('Invalid refresh token', HttpStatus.UNAUTHORIZED);
+    }
+
+    const { accessToken, refreshToken: newRefreshToken } =
+      this.generateTokens(user);
+
+    await this.usersService.saveRefreshToken(user.id, newRefreshToken);
+
+    response.cookie(
+      'access_token',
+      accessToken,
+      this.getAccessTokenCookieOptions(),
+    );
+    response.cookie(
+      'refresh_token',
+      newRefreshToken,
+      this.getRefreshTokenCookieOptions(),
+    );
+
+    return { accessToken };
   }
 }

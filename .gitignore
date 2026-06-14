@@ -41,4 +41,6 @@ postgresdata
 /uploads
 
 /documentation
+/client
+/design
 authorized_key.json

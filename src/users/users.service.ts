@@ -159,6 +159,26 @@ export class UsersService {
     });
   }
 
+  async findByRefreshToken(refreshToken: string) {
+    return this.userRepository.findOne({
+      where: { refreshToken },
+      relations: ['roles'],
+    });
+  }
+
+  async saveRefreshToken(id: number, refreshToken: string | null) {
+    await this.userRepository.update(id, { refreshToken });
+  }
+
+  async isRefreshTokenValid(id: number, refreshToken: string) {
+    const user = await this.userRepository.findOne({
+      where: { id, refreshToken },
+      select: { id: true },
+    });
+
+    return !!user;
+  }
+
   async update(updateUserDto: UpdateUserDto) {
     const end = this.findUserHistogram.startTimer({ operation: 'update' });
 

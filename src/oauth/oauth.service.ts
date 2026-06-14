@@ -38,7 +38,7 @@ export class OAuthService {
         await this.cacheManager.set(email, currentUser);
       }
 
-      this.authService.signin(currentUser, response);
+      await this.authService.signin(currentUser, response);
 
       this.logger.log(`Successful user authorization/registration ${email}`);
     } catch (error) {

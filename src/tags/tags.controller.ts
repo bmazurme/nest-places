@@ -12,9 +12,9 @@ import {
 } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 
-import { Roles } from '../common/decorators/roles.decorator';
+// import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
-import { Role } from '../common/decorators/role.enum';
+// import { Role } from '../common/decorators/role.enum';
 
 import { TagsService } from './tags.service';
 import { JwtGuard } from '../common/guards/jwt.guard';
@@ -37,7 +37,7 @@ export class TagsController {
   }
 
   @Get()
-  @Roles([Role.Admin])
+  // @Roles([Role.Admin])
   // @UseGuards(RolesGuard)
   findAll() {
     return this.tagsService.findAll();

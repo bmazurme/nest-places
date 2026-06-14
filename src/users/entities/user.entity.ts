@@ -7,6 +7,7 @@ import {
   EntityManager,
 } from 'typeorm';
 import { Length, IsUrl, IsEmail } from 'class-validator';
+import { Exclude } from 'class-transformer';
 
 import { BaseEntity } from '../../base-entity';
 import { Card } from '../../cards/entities/card.entity';
@@ -64,6 +65,13 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Like, (like) => like.user)
   likes: User;
+
+  /**
+   * Refresh token used to issue new access tokens
+   */
+  @Exclude()
+  @Column({ type: 'varchar', nullable: true })
+  refreshToken: string | null;
 
   /**
    * Number of cards created by the user
